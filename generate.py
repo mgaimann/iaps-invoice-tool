@@ -243,9 +243,10 @@ def menu(options):
     while 1:
         for i, choice in enumerate(options):
             print("%i. %s" % (i, choice['label']))
-        u = int(input('?: '))
+        u = input('? [0]: ')
         try:
-            action = options[u]
+            u = u if u != '' else 0
+            action = options[int(u)]
             break
         except IndexError:
             print(_('Error.'))
