@@ -5,6 +5,8 @@ from pylatex import Document, Command, UnsafeCommand        # Latex stuff
 from pylatex.utils import NoEscape                          # More Latex Stuff
 from woocommerce import API                                 # Access the WooCommerce API / WOrdpress
 import time
+import numpy as np
+from stl import mesh
 import config as settings
 
 latex_preamble = 'preamble.tex'
@@ -97,10 +99,13 @@ class Item:
             {'tag': True, 'label': 'Friends'}
         ]
         self.pricing_choice_menu = [
-            {'tag': 'weight', 'label': 'Gewicht (g)'},      # Sell bei weight
-            {'tag': 'volume', 'label': 'Volumen (cm3)'},    # Sell by volume, with discount
-            {'tag': 'manual', 'label': 'Zusatz'}            # Normal
+            {'tag': 'weight', 'label': _('Gewicht (g)')},      # Sell bei weight
+            {'tag': 'manvol', 'label': _('Volumen (cm3) manuell')},    # Sell by volume, with discount
+            {'tag': 'autovol', 'label': _('Volumen (cm3) automatisch')},  # Sell by volume, with discount
+            {'tag': 'manual', 'label': _('Zusatz')}            # Normal
         ]
+        self.mesh = None
+        self.filepath = ''
         self.configure()
 
     def setprice(self):
@@ -115,9 +120,13 @@ class Item:
         nl = '\\newline'
         pricing = menu(self.pricing_choice_menu)
 
-        if pricing == 'volume':
+        if pricing in ['manvol', 'autovol']:
             self.discount = menu(self.volume_price_menu)
-            self.volume = int(input(_('Volumen in cm3: '))) if self.volume == 0 else self.volume
+            if pricing == 'manvol':
+                self.volume = int(input(_('Volumen in cm3: '))) if self.volume == 0 else self.volume
+            elif pricing == 'autovol':
+                self.filepath = input(_('Dateipfad: ')) if self.filepath == '' else self.filepath
+                self.volume = round(self.getmeshfilevolume(self.filepath))
             if self.volume > 500 or self.discount:
                 self.price = self.volume * self.discount_price_per_cm3
                 self.discount = True
@@ -125,6 +134,7 @@ class Item:
                 self.price = self.volume * self.price_per_cm3
             volprice = self.discount_price_per_cm3 if self.discount else self.price_per_cm3
             self.desc2 = NoEscape(' ' + nl + str(self.volume) + cm3 + ' bei ' + str(volprice) + '\\euro/' + cm3)
+            print(_('File has a volume of ') + str(self.volume) + ' cm3.')
 
         elif pricing == 'weight':
             self.weight = int(input(_('Gewicht in g: '))) if self.weight == 0 else self.weight
@@ -141,6 +151,11 @@ class Item:
         self.setprice()
         # separator()
 
+    def getmeshfilevolume(self, path):
+        self.mesh = mesh.Mesh.from_file(path)
+        volume, cog, inertia = self.mesh.get_mass_properties()
+        return volume
+
 
 class Invoice:
     def __init__(self, id=None, subject=None, client=None, seller=None, items=None, offer=False):
@@ -148,6 +163,7 @@ class Invoice:
         self.subject = subject
         self.client = client
         self.me = seller
+        self.discount = 0
         self.items = items if items is not None else []
         self.filename = self.id + '-' + time.strftime('%Y')
         self.documentclass = None
@@ -185,18 +201,20 @@ class Invoice:
         self.cli_input_details()    # Details in Dokument eintragen
         self.setuplatex()           # Latex konfigurieren.
         self.cli_input_items()      # Items abfragen
+        self.discount = int(input(_('Ermäßigung in %: '))) if self.discount == 0 else self.discount
+        self.statictext['tdiscount'] = NoEscape(' & & @ Ermäßigung ' + str(self.discount) + '\% & :={[0,-1]*' + str(round(1-self.discount/100,2)) + '+0.00} \\euro \\\\')
         self.fill_document()        # Latex füllen.
         self.doc.generate_pdf(settings.latex['output_folder'] + self.filename, compiler=pdflatex, silent=latex_silent)
         if latex_output:
             self.doc.generate_tex(self.filename)
 
     def cli_input_details(self):
-        print(_('Bitte Rechnungsdetails angeben:'))
+        print(_('Bitte Rechnungsdetails angeben: '))
         self.id = input(self.categroy[1] + ': ')
         self.subject = input(_('Betreff: '))
 
     def cli_input_items(self):
-        i = input(_('Anzahl an Positionen?'))
+        i = input(_('Anzahl an Positionen? '))
         for i in range(0, int(i)):
             new_item = Item()
             self.items.append(new_item)
@@ -219,6 +237,8 @@ class Invoice:
         self.additems()                                             # All the items
         self.doc.append(NoEscape(self.statictext['tsep']))          # Seperator row
         self.doc.append(NoEscape(self.statictext['tsum']))          # Sum of all items
+        if self.discount != 0:
+            self.doc.append(NoEscape(self.statictext['tdiscount']))
         self.doc.append(NoEscape(self.statictext['tvat']))          # VAT
         self.doc.append(NoEscape(self.statictext['ttotal']))        # Total = VAT + sum
         self.doc.append(Command('end', 'spreadtab'))                # End of table
