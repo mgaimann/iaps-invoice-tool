@@ -22,6 +22,11 @@ latex_output = True  # Set True to get .tex files.
 # Todo: Taxation in config file (?)
 # Todo: Find solution fro preamble.tex so i can be generated from config.py?
 
+
+def _(s):
+    return s
+
+
 class Person:
     def __init__(self, company=None, name=None, street=None, postcode=None, city=None, country=None, additional=None, phone=None, email=None):
         self.company = company
@@ -39,13 +44,13 @@ class Person:
         return output
 
     def cli_input(self):
-        print('Bitte Rechnungsadresse eingeben:\n')
-        self.name = input('Name:   ')
-        self.company = input('Firma:  ')
-        self.street = input('Straße: ')
-        self.postcode = input('PLZ:    ')
-        self.city = input('Stadt:  ')
-        print('\nKontrollansicht:\n')
+        print(_('Bitte Rechnungsadresse eingeben:'))
+        self.name = input(_('Name:   '))
+        self.company = input(_('Firma:  '))
+        self.street = input(_('Straße: '))
+        self.postcode = input(_('PLZ:    '))
+        self.city = input(_('Stadt:  '))
+        print(_('Kontrollansicht:'))
         print(self.getaddress())
 
 
@@ -112,7 +117,7 @@ class Item:
 
         if pricing == 'volume':
             self.discount = menu(self.volume_price_menu)
-            self.volume = int(input('Volumen in cm3: ')) if self.volume == 0 else self.volume
+            self.volume = int(input(_('Volumen in cm3: '))) if self.volume == 0 else self.volume
             if self.volume > 500 or self.discount:
                 self.price = self.volume * self.discount_price_per_cm3
                 self.discount = True
@@ -122,17 +127,17 @@ class Item:
             self.desc2 = NoEscape(' ' + nl + str(self.volume) + cm3 + ' bei ' + str(volprice) + '\\euro/' + cm3)
 
         elif pricing == 'weight':
-            self.weight = int(input('Gewicht in g: ')) if self.weight == 0 else self.weight
+            self.weight = int(input(_('Gewicht in g: '))) if self.weight == 0 else self.weight
             self.price = self.weight * self.price_per_g
             self.desc2 = NoEscape(' ' + nl + str(self.weight) + 'g bei ' + str(self.price_per_g * 1000) + '\\euro/kg')
 
         elif pricing == 'manual' and self.price == 0:
-            self.price = input('Preis: ')
+            self.price = input(_('Preis: '))
 
     def configure(self):
         # separator()
-        self.qt = input('Anzahl: ') if self.qt == 0 else self.qt
-        self.desc = input('Beschreibung: ') if self.desc == '' else self.desc
+        self.qt = input(_('Anzahl: ')) if self.qt == 0 else self.qt
+        self.desc = input(_('Beschreibung: ')) if self.desc == '' else self.desc
         self.setprice()
         # separator()
 
@@ -186,12 +191,12 @@ class Invoice:
             self.doc.generate_tex(self.filename)
 
     def cli_input_details(self):
-        print('\nBitte Rechnungsdetails angeben:\n')
+        print(_('Bitte Rechnungsdetails angeben:'))
         self.id = input(self.categroy[1] + ': ')
-        self.subject = input('Betreff: ')
+        self.subject = input(_('Betreff: '))
 
     def cli_input_items(self):
-        i = input('Anzahl an Positionen?\n')
+        i = input(_('Anzahl an Positionen?'))
         for i in range(0, int(i)):
             new_item = Item()
             self.items.append(new_item)
@@ -223,8 +228,8 @@ class Invoice:
 me = Person(settings.me['company'], settings.me['name'], settings.me['street'], settings.me['postcode'], settings.me['city'])
 
 main_menu = [
-    {'tag': False, 'label': 'Rechnung'},
-    {'tag': True, 'label': 'Angebot'}
+    {'tag': False, 'label': _('Rechnung')},
+    {'tag': True, 'label': _('Angebot')}
     ]
 
 
@@ -243,7 +248,7 @@ def menu(options):
             action = options[u]
             break
         except IndexError:
-            print('Error.')
+            print(_('Error.'))
     # separator()
     return action['tag']
 
@@ -260,9 +265,9 @@ def makeinvoice(client, offer=False):
 
 def main():
 
-    # Hinweis: Reihenfolge ist nicht willkürlich.
+    # Hinweis: Reihenfolge ist nicht zufällig.
 
-    print('\nRechnungsgenerator')
+    print(_('Rechnungsgenerator'))
     separator()
     client = Person()
     client.cli_input()                  # Rechnungsadresse abfragen.
