@@ -1,11 +1,11 @@
 # !/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from pylatex import Document, Command, UnsafeCommand
-from pylatex.utils import NoEscape
-from woocommerce import API
+from pylatex import Document, Command, UnsafeCommand        # Latex stuff
+from pylatex.utils import NoEscape                          # More Latex Stuff
+from woocommerce import API                                 # Access the WooCommerce API / WOrdpress
 import time
-import configsample as settings
+import config as settings
 
 latex_preamble = 'preamble.tex'
 pdflatex = '/Library/TeX/texbin/pdflatex'
@@ -13,6 +13,14 @@ latex_silent = True  # Set false for debugging
 latex_output = True  # Set True to get .tex files.
 # This can be usefull for editing invoices if there was an error without having to generate a new latex file.
 
+# Todo: Get the client informations from Wordpress API
+# Todo: Get the order form Wordpress API
+# Todo: Non-WP-Mode: better menue, able to jump between things, corrects etc.
+# Todo: Multipage invoices
+# Todo: Multilingual
+# Todo: store Order config in JSON First line of Latex (in comment) to reload the file an edit it.
+# Todo: Taxation in config file (?)
+# Todo: Find solution fro preamble.tex so i can be generated from config.py?
 
 class Person:
     def __init__(self, company=None, name=None, street=None, postcode=None, city=None, country=None, additional=None, phone=None, email=None):
@@ -124,7 +132,7 @@ class Item:
     def configure(self):
         # separator()
         self.qt = input('Anzahl: ') if self.qt == 0 else self.qt
-        self.desc = input('Beschreibung: ') if self.desc != '' else self.desc
+        self.desc = input('Beschreibung: ') if self.desc == '' else self.desc
         self.setprice()
         # separator()
 
