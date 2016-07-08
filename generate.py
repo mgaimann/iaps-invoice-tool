@@ -201,7 +201,8 @@ class Invoice:
         self.cli_input_details()    # Details in Dokument eintragen
         self.setuplatex()           # Latex konfigurieren.
         self.cli_input_items()      # Items abfragen
-        self.discount = int(input(_('Ermäßigung in %: '))) if self.discount == 0 else self.discount
+        self.discount = input(_('Ermäßigung in %: [0%] '))
+        self.discount = 0 if self.discount == '' else self.discount
         self.statictext['tdiscount'] = NoEscape(' & & @ Ermäßigung ' + str(self.discount) + '\% & :={[0,-1]*' + str(round(1-self.discount/100,2)) + '+0.00} \\euro \\\\')
         self.fill_document()        # Latex füllen.
         self.doc.generate_pdf(settings.latex['output_folder'] + self.filename, compiler=pdflatex, silent=latex_silent)
