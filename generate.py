@@ -23,6 +23,9 @@ latex_output = True  # Set True to get .tex files.
 # Todo: store Order config in JSON First line of Latex (in comment) to reload the file an edit it.
 # Todo: Taxation in config file (?)
 # Todo: Find solution fro preamble.tex so i can be generated from config.py?
+# Todo: Add notifications / text to the end of the invoice, like payment deadline or additional information
+# Todo: Add a folder and scan all the STL-Files into the invoice
+# Todo: Filename in the description if automated price calc.
 
 
 def _(s):
@@ -121,12 +124,12 @@ class Item:
         pricing = menu(self.pricing_choice_menu)
 
         if pricing in ['manvol', 'autovol']:
-            self.discount = menu(self.volume_price_menu)
+            # self.discount = menu(self.volume_price_menu)
             if pricing == 'manvol':
                 self.volume = int(input(_('Volumen in cm3: '))) if self.volume == 0 else self.volume
             elif pricing == 'autovol':
                 self.filepath = input(_('Dateipfad: ')) if self.filepath == '' else self.filepath
-                self.volume = round(self.getmeshfilevolume(self.filepath))
+                self.volume = round(self.getmeshfilevolume(self.filepath), 1)
             if self.volume > 500 or self.discount:
                 self.price = self.volume * self.discount_price_per_cm3
                 self.discount = True
@@ -151,10 +154,10 @@ class Item:
         self.setprice()
         # separator()
 
-    def getmeshfilevolume(self, path):
-        self.mesh = mesh.Mesh.from_file(path)
+    def getmeshfilevolume(self, path, unit=0.001):   # Most files are in mm
+        self.mesh = mesh.Mesh.from_file(path.strip())
         volume, cog, inertia = self.mesh.get_mass_properties()
-        return volume
+        return volume*unit
 
 
 class Invoice:
@@ -202,8 +205,9 @@ class Invoice:
         self.setuplatex()           # Latex konfigurieren.
         self.cli_input_items()      # Items abfragen
         self.discount = input(_('Ermäßigung in %: [0%] '))
-        self.discount = 0 if self.discount == '' else self.discount
-        self.statictext['tdiscount'] = NoEscape(' & & @ Ermäßigung ' + str(self.discount) + '\% & :={[0,-1]*' + str(round(1-self.discount/100,2)) + '+0.00} \\euro \\\\')
+        self.discount = 0 if self.discount == '' else int(self.discount)
+        multi = round(1-self.discount/100, 2)
+        self.statictext['tdiscount'] = NoEscape(' & & @ Ermäßigung ' + str(self.discount) + '\% & :={[0,-1]*' + str(multi) + '+0.00} \\euro \\\\')
         self.fill_document()        # Latex füllen.
         self.doc.generate_pdf(settings.latex['output_folder'] + self.filename, compiler=pdflatex, silent=latex_silent)
         if latex_output:
@@ -253,6 +257,9 @@ main_menu = [
     {'tag': True, 'label': _('Angebot')}
     ]
 
+# -- Start of obelix-tools
+# Because these are useful functions they might be out-sourced in a separate python file one day.
+
 
 def separator():
     print("\n======\n")
@@ -273,6 +280,15 @@ def menu(options):
             print(_('Error.'))
     # separator()
     return action['tag']
+
+
+# This is untested yet
+def defaultinput(text, default):
+    i = input(text + ' [' + str(default) + ']')
+    i = i if i != '' else default
+    return i
+
+# -- End of obelix-tools
 
 
 def makeoffer(client):
