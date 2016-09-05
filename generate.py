@@ -5,8 +5,8 @@ from pylatex import Document, Command, UnsafeCommand        # Latex stuff
 from pylatex.utils import NoEscape                          # More Latex Stuff
 from woocommerce import API                                 # Access the WooCommerce API / WOrdpress
 import time
-import numpy as np
-from stl import mesh
+import numpy as np          # Needed for STL
+from stl import mesh        # Calculate the STL volume
 import config as settings
 
 latex_preamble = 'preamble.tex'
@@ -119,8 +119,8 @@ class Item:
         # 4) calculate price
         # 5) generate additional desctiption
 
-        cm3 = 'cm\\textsuperscript{3}'
-        nl = '\\newline'
+        cm3 = 'cm\\textsuperscript{3}'  # cm^3 in latex
+        nl = '\\newline'                # newline in latex
         pricing = menu(self.pricing_choice_menu)
 
         if pricing in ['manvol', 'autovol']:
@@ -163,10 +163,10 @@ class Item:
 class Invoice:
     def __init__(self, id=None, subject=None, client=None, seller=None, items=None, offer=False):
         self.id = str(id)
-        self.subject = subject
-        self.client = client
-        self.me = seller
-        self.discount = 0
+        self.subject = subject      # Rechnungsbeschriebung
+        self.client = client        # Kundendaten
+        self.me = seller            # Verkäufer
+        self.discount = 0           # Rabatt
         self.items = items if items is not None else []
         self.filename = self.id + '-' + time.strftime('%Y')
         self.documentclass = None
