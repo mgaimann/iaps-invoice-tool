@@ -1,0 +1,28 @@
+# List the start up tasks. Learn more: https://www.gitpod.io/docs/configure/workspaces/tasks
+tasks:
+  - name: Install mamba
+    init:
+      echo 'install mamba'
+      wget -O Mambaforge.sh  "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh"
+      source "${HOME}/conda/etc/profile.d/mamba.sh"
+      source "${HOME}/conda/etc/profile.d/conda.sh"
+      mamba init
+      mamba activate base
+    command:
+      echo 'load mamba'
+      mamba activate base
+
+  - name: Install python packages
+    init:
+      echo 'install python packages'
+      mamba install python=3.11 pip pandas
+
+  - name: Install pylatex
+    init:
+      echo 'install pylatex'
+      pip install pylatex
+
+  - name: Install TeX Live
+    init:
+      echo 'install texlive'
+      sudo apt-get install texlive-pictures texlive-science texlive-latex-extra latexmk
