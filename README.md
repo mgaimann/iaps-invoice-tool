@@ -1,12 +1,30 @@
 # IAPS invoice tool
-Generate nice PDF invoice with LaTeX and Python
-Original version by @loelkes
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/mu-gaimann/iaps-invoice-tool/)
 
-# Motivation
-The tool reads information from the IAPS membership fee spreadsheet and automatically creates invoices from it.
+Generate nice PDF invoices for IAPS, with LaTeX and Python
 
-# What does it do?
+Based on previous work by @loelkes
+
+## Motivation
+The [International Association of Physics Students (IAPS)](https://www.iaps.info/) is an organization for the global physics students community with over 90,000 member. 
+It is organized in individual, local and national memberships and run by volunteers like me.
+IAPS collects membership fees which are computed according to a membership formula, specified in its Charter and Regulations.
+
+Previously, these invoices were tediously written by hand, using Word documents, and sent out manually by email.
+
+The tool seeks to 
+- automate the invoice creation process 
+- create beautiful invoices typeset in LaTeX
+- create legally correct invoices for IAPS' jurisdiction (Alsace-Moselle, France)
+- automate the invoice email sending process
+
+
+## What does it do?
 This generator creates PDF-Documents with LaTeX.
 
-The created invoices comply in many points (but not all) with DIN 5008. They have the folding marks, the address at the right place so you can use envelopes with a windows, contact information in the footer...
+1) It reads information from the IAPS membership fee spreadsheet and enriches it with additional information (invoice number etc.)
+2) It automatically creates a LaTeX invoice document.
+3) It processes the TeX code to PDF files using pdfTeX.
+4) It reads email information from the IAPS membership fee spreadsheet and automatically sends out the invoices.
 
+The created invoices comply in many points (but not all) with DIN 5008.
