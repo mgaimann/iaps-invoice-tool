@@ -3,14 +3,11 @@
 
 from pylatex import Document, Command, UnsafeCommand        # Latex stuff
 from pylatex.utils import NoEscape                          # More Latex Stuff
-from woocommerce import API                                 # Access the WooCommerce API / WOrdpress
 import time
-import numpy as np          # Needed for STL
-from stl import mesh        # Calculate the STL volume
-import config as settings
+import settings
 
 latex_preamble = 'preamble.tex'
-pdflatex = '/Library/TeX/texbin/pdflatex'
+pdflatex = '/usr/bin/pdflatex'
 latex_silent = True  # Set false for debugging
 latex_output = True  # Set True to get .tex files.
 # This can be usefull for editing invoices if there was an error without having to generate a new latex file.
@@ -57,107 +54,6 @@ class Person:
         self.city = input(_('Stadt:  '))
         print(_('Kontrollansicht:'))
         print(self.getaddress())
-
-
-class WPWoocommerce:
-    def __init__(self, invoice):
-        self.url = settings.woocommerce['url']
-        self.key = settings.woocommerce['key']
-        self.secret = settings.woocommerce['secret']
-        self.version = 'v2'
-        self.api = API(self.url, self.key, self.secret)
-        self.order = None
-        self.invoice = invoice
-        self.items = []
-
-    def getorder(self, id):
-        self.order = self.api.get('orders/' + str(id)).json()['order']
-
-    def get_billing_address(self):
-        data = self.order['billing_address']
-        name = data['first_name'] + ' ' + data['last_name']
-        street = data['address_1'] + ' ' + data['address_2']
-        client = Person(data['company'], name, street, data['postcode'], data['city'])
-        return client
-
-#    def get_items(self):                  # This is todo
-#        items = self.order['line_items']  # fee_lines
-
-
-class Item:
-    def __init__(self, qt=0, desc='', desc2='', pricing='manual', price=0, discount=False, weight=0, volume=0):
-        self.qt = qt                        # Quantity
-        self.desc = desc                    # Main description
-        self.price = price                  # Price
-        self.desc2 = desc2                  # Additional description
-        self.volume = volume                # Volume
-        self.discount = discount            # Boolean to set discount mode
-        self.weight = weight                # Weight
-        self.pricing = pricing              # Pricing model: Volume/Weight/Manual
-        self.price_per_g = settings.prices['g']            # Price per gramm
-        self.price_per_cm3 = settings.prices['cm3']           # Price per volume (cm3)
-        self.discount_price_per_cm3 = settings.prices['discount_cm3']  # Discounted price per volume (cm3)
-        self.volume_price_menu = [
-            {'tag': False, 'label': 'Normal'},
-            {'tag': True, 'label': 'Friends'}
-        ]
-        self.pricing_choice_menu = [
-            {'tag': 'weight', 'label': _('Gewicht (g)')},      # Sell bei weight
-            {'tag': 'manvol', 'label': _('Volumen (cm3) manuell')},    # Sell by volume, with discount
-            {'tag': 'autovol', 'label': _('Volumen (cm3) automatisch')},  # Sell by volume, with discount
-            {'tag': 'manual', 'label': _('Zusatz')}            # Normal
-        ]
-        self.mesh = None
-        self.filepath = ''
-        self.configure()
-
-    def setprice(self):
-        # How does this work
-        # 1) check the pricing model: volume/weight/manual
-        # 2) collect data via input if it has not been set
-        # 3) apply discount
-        # 4) calculate price
-        # 5) generate additional desctiption
-
-        cm3 = 'cm\\textsuperscript{3}'  # cm^3 in latex
-        nl = '\\newline'                # newline in latex
-        pricing = menu(self.pricing_choice_menu)
-
-        if pricing in ['manvol', 'autovol']:
-            # self.discount = menu(self.volume_price_menu)
-            if pricing == 'manvol':
-                self.volume = int(input(_('Volumen in cm3: '))) if self.volume == 0 else self.volume
-            elif pricing == 'autovol':
-                self.filepath = input(_('Dateipfad: ')) if self.filepath == '' else self.filepath
-                self.volume = round(self.getmeshfilevolume(self.filepath), 1)
-            if self.volume > 500 or self.discount:
-                self.price = self.volume * self.discount_price_per_cm3
-                self.discount = True
-            else:
-                self.price = self.volume * self.price_per_cm3
-            volprice = self.discount_price_per_cm3 if self.discount else self.price_per_cm3
-            self.desc2 = NoEscape(' ' + nl + str(self.volume) + cm3 + ' bei ' + str(volprice) + '\\euro/' + cm3)
-            print(_('File has a volume of ') + str(self.volume) + ' cm3.')
-
-        elif pricing == 'weight':
-            self.weight = int(input(_('Gewicht in g: '))) if self.weight == 0 else self.weight
-            self.price = self.weight * self.price_per_g
-            self.desc2 = NoEscape(' ' + nl + str(self.weight) + 'g bei ' + str(self.price_per_g * 1000) + '\\euro/kg')
-
-        elif pricing == 'manual' and self.price == 0:
-            self.price = input(_('Preis: '))
-
-    def configure(self):
-        # separator()
-        self.qt = input(_('Anzahl: ')) if self.qt == 0 else self.qt
-        self.desc = input(_('Beschreibung: ')) if self.desc == '' else self.desc
-        self.setprice()
-        # separator()
-
-    def getmeshfilevolume(self, path, unit=0.001):   # Most files are in mm
-        self.mesh = mesh.Mesh.from_file(path.strip())
-        volume, cog, inertia = self.mesh.get_mass_properties()
-        return volume*unit
 
 
 class Invoice:
@@ -221,8 +117,6 @@ class Invoice:
     def cli_input_items(self):
         i = input(_('Anzahl an Positionen? '))
         for i in range(0, int(i)):
-            new_item = Item()
-            self.items.append(new_item)
             separator()
 
     def additems(self):

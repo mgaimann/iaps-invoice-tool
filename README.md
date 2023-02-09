@@ -30,8 +30,12 @@ This generator creates PDF-Documents with LaTeX.
 The created invoices comply in many points (but not all) with DIN 5008.
 
 ## Installation
+- Install [TeX Live](https://www.tug.org/texlive/) (or any other LaTeX distribution) for example with:
+  - `sudo apt-get install texlive`
 - Install [Mamba](https://github.com/mamba-org/mamba) (or any other conda-oid package manager) by following these [Instructions](https://github.com/conda-forge/miniforge#install), or by executing:
   - `wget "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh"`
   - `bash Mambaforge-$(uname)-$(uname -m).sh`
-- Create a mamba environment with `mamba env create -f environment.yaml`
-- Activate the environment with `mamba activate iaps-invoice-tool`
+- Create a mamba environment with: 
+  - `mamba env create -f environment.yaml`
+- Activate the environment with: 
+  - `mamba activate iaps-invoice-tool`
