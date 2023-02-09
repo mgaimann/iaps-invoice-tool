@@ -1,3 +1,7 @@
+# specific ignores
+data/  # contains sensitive data
+
+
 # Created by .ignore support plugin (hsz.mobi)
 
 config.py
@@ -95,3 +99,4 @@ ENV/
 .ropeproject
 
 .idea/
+

@@ -1,0 +1,11 @@
+name: iaps-invoice-tool
+channels:  # strict channel priority enforced! order matters
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.11
+  - snakemake
+  - pandas
+  - texlive-core
+  - pylatex
