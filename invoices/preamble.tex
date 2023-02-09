@@ -1,0 +1,55 @@
+% !TEX encoding = UTF-8 Unicode
+
+\usepackage[british]{babel}
+\renewcommand*{\familydefault}{\ttdefault}
+\usepackage{spreadtab}
+\usepackage{tabularx}
+\usepackage{fp}
+\usepackage{eurosym}
+
+
+\setkomavar{date}[Date]{\today}
+%\renewcommand*{\raggedsignature}{\raggedright}
+
+\setkomavar{fromname}{The International Association of Physics Students}
+\setkomavar{fromemail}{membership-fees@iaps.info}
+\setkomavar{fromaddress}{6 Rue des Frères Lumière\\ 68200 Mulhouse, France}
+\setkomavar{frombank}{Caisse d'Epargne Grand Est Europe\\
+34 avenue du Général Leclerc\\
+68100 Mulhouse, France\\
+Phone: +33 389326141\\  \\
+
+IBAN: DE00 0000 0000 0000 0000 00\\
+BIC: CEPAFRPP513\\
+Paypal: iaps@eps.org}
+
+\setkomavar{firstfoot}{
+	\parbox[t]{\textwidth}{\footnotesize
+	The \textit{INTERNATIONAL ASSOCIATION OF PHYSICS STUDENTS - IAPS}
+		is a non-profit organization (association à but non lucratif de
+		 droit local alsacien-mosellan) registered at the
+		 Tribunal d'instance de Mulhouse in France (Volume 79, Folio Nr.~126, SIRET: 450 382 338 00017).
+	\\  \\
+
+	\begin{tabular}[t]{l@{}}
+		 \multicolumn{1}{@{}l@{}}{Contact:}\\  \\
+		 \usekomavar{fromaddress} \\  \\
+
+		 Treasurer: Mario Gaimann \\
+		 Membership Fees Officer: Max Peters \\  \\
+
+		 E-Mail: \usekomavar{fromemail}  \\
+		Website: www.iaps.info
+	\end{tabular}
+%	 \hfill{}
+%	 \begin{tabular}[t]{l@{}}
+%		 \multicolumn{1}{@{}l@{}}{Asdf}\\
+%		 Paypal: iaps@eps.org\\
+%
+%	 \end{tabular}
+	 \hfill{}
+	 \begin{tabular}[t]{l@{}}
+		 \multicolumn{1}{@{}l@{}}{Payment information:}\\  \\
+		 \usekomavar{frombank}
+	 \end{tabular}
+ }}
