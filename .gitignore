@@ -1,5 +1,5 @@
-# specific ignores
-data/  # contains sensitive data
+# specific ignores # contains sensitive data
+data/
 
 
 # Created by .ignore support plugin (hsz.mobi)
