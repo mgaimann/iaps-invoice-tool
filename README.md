@@ -1,5 +1,5 @@
 # IAPS invoice tool
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/mu-gaimann/iaps-invoice-tool/)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/mu-gaimann/iaps-invoice-tool/) [not yet implemented]
 
 Generate nice PDF invoices for IAPS, with LaTeX and Python
 
