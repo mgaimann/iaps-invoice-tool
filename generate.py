@@ -52,7 +52,7 @@ class Member:
 class Invoice:
     def __init__(self, id=None, subject=None, client=None, seller=None, items=None, offer=False):
         self.id = str(0)
-        self.subject = "IAPS Membership Fees 2022/23"
+        self.subject = "Your IAPS Membership Fee 2022/23 - Invoice"
         self.client = client  # Kundendaten
         self.me = seller  # Verkäufer
         self.discount = 0  # Rabatt
@@ -96,7 +96,7 @@ class Invoice:
         self.discount = 0 if self.discount == '' else int(self.discount)
         multi = round(1 - self.discount / 100, 2)
         self.statictext['tdiscount'] = NoEscape(
-            ' & & @ Ermäßigung ' + str(self.discount) + '\% & :={[0,-1]*' + str(multi) + '+0.00} \\euro \\\\')
+            ' & & @ Discount ' + str(self.discount) + '\% & :={[0,-1]*' + str(multi) + '+0.00} \\euro \\\\')
         self.fill_document()  # Latex füllen.
         self.doc.generate_pdf(settings.latex['output_folder'] + self.filename, compiler=pdflatex, silent=latex_silent)
         if latex_output:
@@ -125,6 +125,16 @@ class Invoice:
         self.doc.append(NoEscape(self.statictext['tvat']))  # VAT
         self.doc.append(NoEscape(self.statictext['ttotal']))  # Total = VAT + sum
         self.doc.append(Command('end', 'spreadtab'))  # End of table
+        self.doc.append(
+            '\\  Remarks: Please settle the invoice within 14 days after receipt. '
+            'Please use a wire transfer to pay the invoice in a single transaction, otherwise Paypal '
+            '(IAPS Regulations Article 3.4.5). If you wish to apply for a reduction of your membership fee '
+            'in the event of national severe economic downturn due to a global catastrophe '
+            '(IAPS Regulations Article 3.4.4.d), this must be done within 14 days of receipt of this invoice '
+            '(Resolution EC/2022-23/XX). '
+            'Failure to pay the invoice by June 1 will result in the irrevocable loss of voting rights '
+            'at the Annual General Meeting in the current financial year (IAPS Charter Article 8.3) and may '
+            'lead to membership termination through expulsion (IAPS Charter Article 9.1.4).')
         self.doc.append(Command('end', 'letter'))  # End of document
 
 

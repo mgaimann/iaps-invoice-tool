@@ -1,5 +1,6 @@
 \ProvidesFile{template.loc}[]
 
 % firstfootvpos has to have more space to the bottom
-\@setplength{firstfootvpos}{250mm}  %\paperheight
+\@setplength{firstfootvpos}{200mm}  %\paperheight
+%\@setplength{firstfootvpos}{260mm}  %\paperheight
 \@addtoplength[-]{firstfootvpos}{30mm}

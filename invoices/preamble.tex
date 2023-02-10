@@ -13,43 +13,49 @@
 
 \setkomavar{fromname}{The International Association of Physics Students}
 \setkomavar{fromemail}{membership-fees@iaps.info}
-\setkomavar{fromaddress}{6 Rue des Frères Lumière\\ 68200 Mulhouse, France}
-\setkomavar{frombank}{Caisse d'Epargne Grand Est Europe\\
-34 avenue du Général Leclerc\\
-68100 Mulhouse, France\\
-Phone: +33 389326141\\  \\
+\setkomavar{fromaddress}{6 Rue des Frères Lumière \\ 68200 Mulhouse, France}
+\newcommand{\frombank}{Caisse d'Epargne Grand Est Europe}
+\newcommand{\frombankaddress}{34 Avenue du Général Leclerc}
+\newcommand{\frombankaddressTwo}{68100 Mulhouse, France}
+\newcommand{\frombankphone}{+33 389326141}
+\newcommand{\fromiban}{DE00 0000 0000 0000 0000 00}
+\newcommand{\frombic}{CEPAFRPP513}
+\newcommand{\frompaypal}{iaps@eps.org}
 
-IBAN: DE00 0000 0000 0000 0000 00\\
-BIC: CEPAFRPP513\\
-Paypal: iaps@eps.org}
 
 \setkomavar{firstfoot}{
 	\parbox[t]{\textwidth}{\footnotesize
+
+
 	The \textit{INTERNATIONAL ASSOCIATION OF PHYSICS STUDENTS - IAPS}
 		is a non-profit organization (association à but non lucratif de
 		 droit local alsacien-mosellan) registered at the
-		 Tribunal d'instance de Mulhouse in France (Volume 79, Folio Nr.~126, SIRET: 450 382 338 00017).
-	\\  \\
+		 Tribunal d'instance de Mulhouse in France (Volume 79, Folio Nr.~126). SIRET: 450 382 338 00017.\\
 
-	\begin{tabular}[t]{l@{}}
-		 \multicolumn{1}{@{}l@{}}{Contact:}\\  \\
-		 \usekomavar{fromaddress} \\  \\
+	\begin{tabular}[t]{ll}
+		 \multicolumn{2}{c}{Contact}\\ \hline \\
+		 Address: & 6 Rue des Frères Lumière \\
+					& 68200 Mulhouse, France\\ \\
 
-		 Treasurer: Mario Gaimann \\
-		 Membership Fees Officer: Max Peters \\  \\
+		 Treasurer: &Mario Gaimann \\
+		 Contact: &Max Peters \\  \\
 
-		 E-Mail: \usekomavar{fromemail}  \\
-		Website: www.iaps.info
+		 E-Mail: &\usekomavar{fromemail}  \\
+		Website: &www.iaps.info\\
 	\end{tabular}
-%	 \hfill{}
-%	 \begin{tabular}[t]{l@{}}
-%		 \multicolumn{1}{@{}l@{}}{Asdf}\\
-%		 Paypal: iaps@eps.org\\
-%
-%	 \end{tabular}
+
 	 \hfill{}
-	 \begin{tabular}[t]{l@{}}
-		 \multicolumn{1}{@{}l@{}}{Payment information:}\\  \\
-		 \usekomavar{frombank}
+	 \begin{tabular}[t]{ll}
+		 \multicolumn{2}{c}{Payment information}\\
+		 \hline\\
+		 Bank: &\frombank \\
+		 Address: &\frombankaddress \\
+		 &\frombankaddressTwo \\
+		 Phone: &\frombankphone \\ \\
+
+		 IBAN: &\fromiban \\
+		 SWIFT: &\frombic \\
+		 Paypal: &\frompaypal \\
 	 \end{tabular}
+
  }}
