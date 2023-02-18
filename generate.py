@@ -113,7 +113,7 @@ class Invoice:
         self.fill_document()  # Latex füllen.
         self.doc.generate_pdf(settings.latex['output_folder'] + self.filename, compiler=pdflatex, silent=latex_silent)
         if latex_output:
-            self.doc.generate_tex(self.filename)
+            self.doc.generate_tex(settings.latex['output_folder'] + self.filename)
 
     def additems(self):
         for item in self.items:
