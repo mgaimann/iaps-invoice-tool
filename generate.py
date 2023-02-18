@@ -91,7 +91,8 @@ class Invoice:
         self.items = items if items is not None else []
         self.filename = self.id
         self.documentclass = None
-        self.docoptions = 'DIN,pagenumber=true,parskip=half,fromalign=right,fromphone=false,fromurl=true,fromfax=false,fromrule=false,fromlogo=True,fontsize=12pt'
+        self.docoptions = 'DIN,pagenumber=true,parskip=half,fromalign=right,fromphone=false,' \
+                          'fromurl=true,fromfax=false,fromrule=false,fromlogo=True,fontsize=12pt'
         self.doc = None
         self.category = ['Invoice', 'Invoice Number']
         self.statictext = {
@@ -175,6 +176,7 @@ class Invoice:
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append('* Your membership fee explained (IAPS Regulations Article 3.4.1):')
+        self.doc.append(Command('begin', 'footnotesize'))
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(NewLine())
@@ -215,6 +217,7 @@ class Invoice:
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(NewLine())
+        self.doc.append(Command('end', 'footnotesize'))
         self.doc.append("For the IAPS Executive Committee sincerely,")
         self.doc.append(NewLine())
         self.doc.append(NewLine())
@@ -223,6 +226,8 @@ class Invoice:
         self.doc.append(NoEscape("Mario Gaimann & Max Peters \\\\"))
         self.doc.append(NoEscape("IAPS Treasurer 2022/23 & Membership Fees Officer 2022/23 \\\\"))
         self.doc.append(NoEscape('\\end{tabular}'))
+        self.doc.append(NewLine())
+        self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(NewLine())
@@ -238,11 +243,13 @@ class Invoice:
                      f'{self.sources["gni"]}'
                      '}'))
         self.doc.append(NewLine())
+        self.doc.append(NewLine())
         self.doc.append(NoEscape('\\textsuperscript{2} Source: \\href{'
                                  f'{self.sources["wesp_annex"]}'
                                  '}{United Nations,  Dept.~of Economic and Social Affairs, World Economic Situation and Prospects 2022,\\\\'
                                  f'{self.sources["wesp_annex"]}'
                                  '}'))
+        self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(NoEscape(
             'Generated with the open-source IAPS Invoice Generator based on Python and \\LaTeX, available under \\\\'
