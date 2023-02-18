@@ -77,7 +77,7 @@ class Member:
 class Item:
     def __init__(self, financial_year=None, price=None):
         self.qt = 1.00
-        self.desc = f'IAPS Membership Fee {financial_year}/{financial_year + 1}'
+        self.desc = f'IAPS Membership Fee {financial_year}/{financial_year + 1} *'
         self.price = price
 
 
@@ -115,18 +115,17 @@ class Invoice:
         self.doc.preamble.append(Command('setkomavar', arguments='subject', extra_arguments=self.subject))
         self.doc.preamble.append(
             Command('setkomavar', arguments='yourmail', options=self.category[1], extra_arguments=self.filename))
-        # Falls man Kundennummer implementieren möchte.
         # %\setkomavar{yourref}[Ihre Kundennummer]{263}
 
     def generate(self):
-        self.setuplatex()  # Latex konfigurieren.
-        self.discount = self.client.fee - self.client.fee_excl_discount
+        self.setuplatex()
+        self.discount = self.client.fee_excl_discount - self.client.fee
         self.discount = 0 if self.discount == '' else int(self.discount)
         discount_percentage = round(100 - self.client.total_discount_factor * 100, 4)
         self.statictext['tdiscount'] = NoEscape(
-            ' & & @ Discount ' + f'{discount_percentage:.2f}\,\% & '
+            ' & & @ \\textdaggerdbl~Discount ' + f'{discount_percentage:.2f}\,\% & '
                                  f' @{self.discount:.2f} EUR \\\\')
-        self.fill_document()  # Latex füllen.
+        self.fill_document()
         self.doc.generate_pdf(settings.latex['output_folder'] + self.filename, compiler=pdflatex, silent=latex_silent)
         if latex_output:
             self.doc.generate_tex(settings.latex['output_folder'] + self.filename)
@@ -134,12 +133,12 @@ class Invoice:
     def additems(self):
         for item in self.items:
             self.doc.append(
-                NoEscape(str(item.qt) + ' & @ ' + item.desc + ' & ' + str(item.price) + ' & @' + str(item.price) +' EUR'))
+                NoEscape(f'{item.qt:.2f} & @ {item.desc} & @ {item.price:.2f} & @ {item.price:.2f} EUR'))
 
     def fill_document(self):
         self.doc.append(Command('begin', arguments='letter', extra_arguments=self.client.getaddress()))
         self.doc.append(Command('opening', ' '))
-        self.doc.append(UnsafeCommand('vspace', '-1.0cm'))
+        self.doc.append(UnsafeCommand('vspace', '-.5cm'))
         self.doc.append(Command('STautoround*', '2'))  # Round 2 decimals
         self.doc.append(Command('STsetdecimalsep', '.'))  # Decimal separator sign
         self.doc.append(NoEscape(self.statictext['tdef']))  # Table definition
@@ -156,8 +155,10 @@ class Invoice:
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(NewLine())
+        self.doc.append(NewLine())
+        self.doc.append(NewLine())
         self.doc.append(NoEscape(
-            'Please settle the invoice within 14 days after receipt, \\textbf{using the invoice number as reference or purpose of payment}. '
+            'Please settle the invoice within 14 days after receipt, \\textbf{using the invoice number as reference}. '
             'Please use a wire transfer to pay the invoice in a single transaction, otherwise Paypal '
             '(IAPS Regulations Article 3.4.5). '))
         self.doc.append(NewPage())
@@ -173,7 +174,7 @@ class Invoice:
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(NewLine())
-        self.doc.append('Your membership fee explained (IAPS Regulations Article 3.4.1):')
+        self.doc.append('* Your membership fee explained (IAPS Regulations Article 3.4.1):')
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(NewLine())
@@ -207,7 +208,7 @@ class Invoice:
         self.doc.append(NoEscape(f'First Year &3.4.4.b& {self.client.discount_first_year} \\\\'))
         self.doc.append(NoEscape(f'Probationary &3.4.4.a& {self.client.discount_probationary} \\\\'))
         self.doc.append(NoEscape(f'Economic Downturn &3.4.4.d& {self.client.discount_econ_downturn} \\\\'))
-        self.doc.append(NoEscape(f'Total (multiplicative)& 3.4 & {self.client.total_discount_factor} \\\\'))
+        self.doc.append(NoEscape(f'\\textdaggerdbl~Total (multiplicative)  & 3.4 & {self.client.total_discount_factor} \\\\'))
         self.doc.append(NoEscape('\\end{tabular} \\\\'))
         self.doc.append(NewLine())
         self.doc.append(NewLine())
@@ -231,7 +232,7 @@ class Invoice:
                         'wesp_annex': 'https://www.un.org/development/desa/dpad/wp-content/uploads/sites/45/WESP2022\\_ANNEX.pdf'}
 
         self.doc.append(
-            NoEscape('\\textsuperscript{1} Gross National Income, Atlas Method (current USD). Source: \\href{'
+            NoEscape('\\textsuperscript{1} Gross National Income of your country(s), Atlas Method (current USD). Source: \\href{'
                      f'{self.sources["gni"]}'
                      '}{The World Bank, \\\\'
                      f'{self.sources["gni"]}'
@@ -243,11 +244,10 @@ class Invoice:
                                  f'{self.sources["wesp_annex"]}'
                                  '}'))
         self.doc.append(NewLine())
-        self.doc.append(NewLine())
         self.doc.append(NoEscape(
             'Generated with the open-source IAPS Invoice Generator based on Python and \\LaTeX, available under \\\\'
             '\\href{https://github.com/mu-gaimann/iaps-invoice-tool}{https://github.com/mu-gaimann/iaps-invoice-tool}. '
-            'Interested in contributing? Found a typo or a bug? You want to give feedback? Open an issue on GitHub or contact \\href{mailto:membership-fees@iaps.info}{membership-fees@iaps.info}.'))
+            'Interested in contributing? Found a typo or a bug? Feedback or suggestions? Open an issue on GitHub or contact \\href{mailto:membership-fees@iaps.info}{membership-fees@iaps.info}.'))
         self.doc.append(Command('end', 'letter'))  # End of document
 
 
@@ -279,9 +279,9 @@ def makeinvoice(client):
 
 test_client_nc = {"company": "NC Antarctica", "name": "P. Enguin", "street": "South Pole 1", "postcode": "96420",
                   "city": "Ice City", "country": "Antarctica", "additional": "Cold District", "phone": "+99 17287 7832",
-                  "email": "nc-antarctica@iaps.info", "fee": 123.45,
-                  "country_code": "ATA", "membership_type": "NC", "fee_excl_discount": 420.00,
-                  "discount": 70, "discount_lc": 1.00,
+                  "email": "nc-antarctica@iaps.info", "fee": 93.50,
+                  "country_code": "ATA", "membership_type": "NC", "fee_excl_discount": 187.00,
+                  "discount_lc": 1.00,
                   "discount_first_year": 1.00, "discount_probationary": 0.50, "discount_econ_downturn": 1.00,
                   "development_factor": 0.50, "gni_atlas_method": 52341987.02}
 

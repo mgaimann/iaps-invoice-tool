@@ -31,37 +31,43 @@
 
 
 \setkomavar{firstfoot}{
-	\parbox[t]{\textwidth}{\footnotesize
+    \parbox[t]{\textwidth}{\footnotesize
 
+%    \hrule \vspace{.5cm}
+     The \textit{INTERNATIONAL ASSOCIATION OF PHYSICS STUDENTS - IAPS}
+    is a non-profit organization (association à but non lucratif de
+    droit local alsacien-mosellan) registered at the
+    Tribunal d'instance de Mulhouse in France (Volume 79, Folio Nr.~126). SIRET: 450 382 338 00017.\\
 
-	The \textit{INTERNATIONAL ASSOCIATION OF PHYSICS STUDENTS - IAPS}
-		is a non-profit organization (association à but non lucratif de
-		 droit local alsacien-mosellan) registered at the
-		 Tribunal d'instance de Mulhouse in France (Volume 79, Folio Nr.~126). SIRET: 450 382 338 00017.\\
+    }
+%            \parbox{.45\linewidth}{
+    \footnotesize
+                \begin{tabular}[t]{ll}
+                    \multicolumn{2}{c}{Contact} \\ \hline   \\
+                    Address:         & 6 Rue des Frères Lumière   \\
+                    & 68200 Mulhouse, France            \\ \\
 
-	\begin{tabular}[t]{ll}
-		 \multicolumn{2}{c}{Contact}\\ \hline \\
-		 Address: & 6 Rue des Frères Lumière \\
-					& 68200 Mulhouse, France\\ \\
+                    Treasurer: & Mario Gaimann \\
+                    Contact: & Max Peters \\  \\
 
-		 Treasurer: &Mario Gaimann \\
-		 Contact: &Max Peters \\  \\
+                    E-Mail: & \usekomavar{fromemail}  \\
+                    Website: & \usekomavar{fromurl} \\
+                \end{tabular}
+%            }
+            \hfill{}
+%            \parbox{.45\linewidth}{
+    \footnotesize
+                \begin{tabular}[t]{ll}
+                    \multicolumn{2}{c}{Payment Information} \\
+                    \hline \\
+                    Bank:      & \frombank           \\ \\
 
-		 E-Mail: &\usekomavar{fromemail}  \\
-		Website: &\usekomavar{fromurl} \\
-	\end{tabular}
+                    Address:   & \frombankaddress    \\
+                    & \frombankaddressTwo \\ \\
 
-	 \hfill{}
-	 \begin{tabular}[t]{ll}
-		 \multicolumn{2}{c}{Payment information}\\
-		 \hline\\
-		 Bank: &\frombank \\
-		 Address: &\frombankaddress \\
-		 &\frombankaddressTwo \\ \\
-
-		 IBAN: &\fromiban \\
-		 SWIFT: &\frombic \\
-		 Paypal/CC: &\frompaypal \\
-	 \end{tabular}
-
- }}
+                    IBAN: & \fromiban \\
+                    SWIFT: & \frombic \\
+                    Paypal/CC: & \frompaypal \\
+                \end{tabular}
+%            }\label{tab:table}
+    }
