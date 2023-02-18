@@ -1,12 +1,12 @@
 # !/usr/bin/python
 # -*- coding: utf-8 -*-
 import copy
-import zlib
 
 from pylatex import Document, Command, UnsafeCommand, LineBreak, NewLine, NewPage, Math  # Latex stuff
 from pylatex.utils import NoEscape  # More Latex Stuff
 import time
 import settings
+
 
 latex_preamble = 'preamble.tex'
 pdflatex = '/usr/bin/pdflatex'
@@ -37,8 +37,8 @@ class Member:
     def __init__(self, company=None, name=None, street=None, postcode=None, city=None, country=None, additional=None,
                  phone=None, email=None, fee=None, country_code=None, membership_type=None
                  , firstname=None, lastname=None,
-                 fee_excl_discount=None, discount=None, discount_lc=None, discount_first_year=None,
-                 discount_probationary=None, discount_econ_downturn=None, development_factor=None,
+                 fee_excl_discount=None, discount=None, discount_lc=1.0, discount_first_year=1.0,
+                 discount_probationary=1.0, discount_econ_downturn=1.0, development_factor=1.0,
                  gni_atlas_method=None):
         self.company = company
         self.name = name
@@ -60,6 +60,7 @@ class Member:
         self.discount_first_year = discount_first_year
         self.discount_probationary = discount_probationary
         self.discount_econ_downturn = discount_econ_downturn
+        self.total_discount_factor = self.discount_lc * self.discount_first_year * self.discount_probationary * self.discount_econ_downturn
         self.development_factor = development_factor
         self.gni_atlas_method = gni_atlas_method
 
@@ -75,7 +76,7 @@ class Member:
 
 class Item:
     def __init__(self, financial_year=None, price=None):
-        self.qt = 1
+        self.qt = 1.00
         self.desc = f'IAPS Membership Fee {financial_year}/{financial_year + 1}'
         self.price = price
 
@@ -84,9 +85,9 @@ class Invoice:
     def __init__(self, id=None, financial_year=None, client=None, seller=None, items=None):
         self.id = id
         self.subject = f"Your IAPS Membership Fee {financial_year}/{str(int(financial_year) + 1)} --- Invoice"
-        self.client = client  # Kundendaten
-        self.me = seller  # Verkäufer
-        self.discount = 0  # Rabatt
+        self.client = client
+        self.me = seller
+        self.discount = client.discount
         self.items = items if items is not None else []
         self.filename = self.id
         self.documentclass = None
@@ -98,9 +99,11 @@ class Invoice:
             'thead': '@ Units & @ Item & @ Price per Unit  & @ Total \\\\ \\hline',
             'temptyrow': '@ & @ & @ & @ \\\\',
             'tsep': '\\\\ \\hline \\hline \\\\',
-            'tsum': ' & & @ Sub-total & :={sum(d2:[0,-3])} \\euro \\\\',
-            'tvat': ' & & @ VAT 0\% & :={[0,-1]*0.19+0.00} \\euro \\\\',
-            'ttotal': ' & & @ Total & :={sum([0,-2]:[0,-1])} \\euro \\\\'
+            'tsum': f' & & @ Sub-total & @ {self.client.fee_excl_discount:.2f} EUR \\\\',
+            'tvat': ' & & @ VAT 0\% & @ 0.00 EUR  \\\\',
+            'ttotal': ' & & @ \\textbf{Total} & @ \\textbf{'
+                      f'{self.client.fee:.2f}'
+                      ' EUR} \\\\'
         }
 
     def setuplatex(self):
@@ -117,11 +120,12 @@ class Invoice:
 
     def generate(self):
         self.setuplatex()  # Latex konfigurieren.
-        self.discount = 5
+        self.discount = self.client.fee - self.client.fee_excl_discount
         self.discount = 0 if self.discount == '' else int(self.discount)
-        multi = round(1 - self.discount / 100, 2)
+        discount_percentage = round(100 - self.client.total_discount_factor * 100, 4)
         self.statictext['tdiscount'] = NoEscape(
-            ' & & @ Discount ' + str(self.discount) + '\% & :={[0,-1]*' + str(multi) + '+0.00} \\euro \\\\')
+            ' & & @ Discount ' + f'{discount_percentage:.2f}\,\% & '
+                                 f' @{self.discount:.2f} EUR \\\\')
         self.fill_document()  # Latex füllen.
         self.doc.generate_pdf(settings.latex['output_folder'] + self.filename, compiler=pdflatex, silent=latex_silent)
         if latex_output:
@@ -129,16 +133,15 @@ class Invoice:
 
     def additems(self):
         for item in self.items:
-            tail = '\\euro 	& :={[-3,0]*[-1,0]} \\euro \\\\'
             self.doc.append(
-                NoEscape(str(item.qt) + ' & @ ' + item.desc + ' & :={' + str(item.price) + '} ' + tail))
+                NoEscape(str(item.qt) + ' & @ ' + item.desc + ' & ' + str(item.price) + ' & @' + str(item.price) +' EUR'))
 
     def fill_document(self):
         self.doc.append(Command('begin', arguments='letter', extra_arguments=self.client.getaddress()))
         self.doc.append(Command('opening', ' '))
         self.doc.append(UnsafeCommand('vspace', '-1.0cm'))
         self.doc.append(Command('STautoround*', '2'))  # Round 2 decimals
-        self.doc.append(Command('STsetdecimalsep', ','))  # Decimal separator sign
+        self.doc.append(Command('STsetdecimalsep', '.'))  # Decimal separator sign
         self.doc.append(NoEscape(self.statictext['tdef']))  # Table definition
         self.doc.append(NoEscape(self.statictext['thead']))  # Table head
         self.doc.append(NoEscape(self.statictext['temptyrow']))  # Empty row
@@ -153,10 +156,10 @@ class Invoice:
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(NewLine())
-        self.doc.append(
-            'Please settle the invoice within 14 days after receipt. '
+        self.doc.append(NoEscape(
+            'Please settle the invoice within 14 days after receipt, \\textbf{using the invoice number as reference or purpose of payment}. '
             'Please use a wire transfer to pay the invoice in a single transaction, otherwise Paypal '
-            '(IAPS Regulations Article 3.4.5). ')
+            '(IAPS Regulations Article 3.4.5). '))
         self.doc.append(NewPage())
         self.doc.append(
             'Remarks: If you wish to apply for a reduction of your membership fee '
@@ -190,8 +193,10 @@ class Invoice:
         self.doc.append(NoEscape('\\hline'))
         self.doc.append(NoEscape('&& \\\\'))
         self.doc.append(NoEscape(f'Membership Type&3.4.3 & {self.client.membership_type} \\\\'))
-        self.doc.append(NoEscape(f'GNI Atl.~Mtd.\\textsuperscript{1}, $10^6$ USD (G)&3.4.2.c & {self.client.gni_atlas_method} \\\\'))
-        self.doc.append(NoEscape(f'Development Factor\\textsuperscript{2} (d)&3.4.4.d & {self.client.development_factor} \\\\'))
+        self.doc.append(NoEscape(
+            f'GNI Atl.~Mtd.\\textsuperscript{1}, $10^6$ USD (G)&3.4.2.c & {self.client.gni_atlas_method} \\\\'))
+        self.doc.append(
+            NoEscape(f'Development Factor\\textsuperscript{2} (d)&3.4.4.d & {self.client.development_factor} \\\\'))
         self.doc.append(NoEscape('&& \\\\'))
         self.doc.append(NoEscape('&& \\\\'))
 
@@ -202,7 +207,7 @@ class Invoice:
         self.doc.append(NoEscape(f'First Year &3.4.4.b& {self.client.discount_first_year} \\\\'))
         self.doc.append(NoEscape(f'Probationary &3.4.4.a& {self.client.discount_probationary} \\\\'))
         self.doc.append(NoEscape(f'Economic Downturn &3.4.4.d& {self.client.discount_econ_downturn} \\\\'))
-        self.doc.append(NoEscape(f'Total (multiplicative)& 3.4 & {self.client.discount_lc * self.client.discount_first_year * self.client.discount_probationary * self.client.discount_econ_downturn} \\\\'))
+        self.doc.append(NoEscape(f'Total (multiplicative)& 3.4 & {self.client.total_discount_factor} \\\\'))
         self.doc.append(NoEscape('\\end{tabular} \\\\'))
         self.doc.append(NewLine())
         self.doc.append(NewLine())
@@ -225,11 +230,12 @@ class Invoice:
         self.sources = {'gni': 'https://api.worldbank.org/v2/en/indicator/NY.GNP.ATLS.CD?downloadformat=csv',
                         'wesp_annex': 'https://www.un.org/development/desa/dpad/wp-content/uploads/sites/45/WESP2022\\_ANNEX.pdf'}
 
-        self.doc.append(NoEscape('\\textsuperscript{1} Gross National Income, Atlas Method (current USD). Source: \\href{'
-                                 f'{self.sources["gni"]}'
-                                 '}{The World Bank, \\\\'
-                                 f'{self.sources["gni"]}'
-                                 '}'))
+        self.doc.append(
+            NoEscape('\\textsuperscript{1} Gross National Income, Atlas Method (current USD). Source: \\href{'
+                     f'{self.sources["gni"]}'
+                     '}{The World Bank, \\\\'
+                     f'{self.sources["gni"]}'
+                     '}'))
         self.doc.append(NewLine())
         self.doc.append(NoEscape('\\textsuperscript{2} Source: \\href{'
                                  f'{self.sources["wesp_annex"]}'
