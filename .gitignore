@@ -1,5 +1,6 @@
 # specific ignores # contains sensitive data
 data/
+invoices/
 
 
 # Created by .ignore support plugin (hsz.mobi)
