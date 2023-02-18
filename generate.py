@@ -1,5 +1,6 @@
 # !/usr/bin/python
 # -*- coding: utf-8 -*-
+import copy
 import zlib
 
 from pylatex import Document, Command, UnsafeCommand, LineBreak, NewLine, NewPage, Math  # Latex stuff
@@ -64,9 +65,9 @@ class Member:
 
     def getaddress(self):
         if self.membership_type != "IM":
-            output = self.company + '\n' + self.name + '\n' + self.street + '\n' + self.postcode + ' ' + self.city
+            output = self.company + '\n' + self.name + '\n' + self.street + '\n' + self.postcode + ' ' + self.city + '\n' + self.country
         elif self.membership_type == "IM":
-            output = f"{self.firstname} {self.lastname}" + '\n' + self.street + '\n' + self.postcode + ' ' + self.city
+            output = f"{self.firstname} {self.lastname}" + '\n' + self.street + '\n' + self.postcode + ' ' + self.city + '\n' + self.country
         else:
             raise ValueError("Membership type not set")
         return output
@@ -82,7 +83,7 @@ class Item:
 class Invoice:
     def __init__(self, id=None, financial_year=None, client=None, seller=None, items=None):
         self.id = id
-        self.subject = f"Your IAPS Membership Fee {financial_year}/{str(int(financial_year)+1)} --- Invoice"
+        self.subject = f"Your IAPS Membership Fee {financial_year}/{str(int(financial_year) + 1)} --- Invoice"
         self.client = client  # Kundendaten
         self.me = seller  # Verkäufer
         self.discount = 0  # Rabatt
@@ -188,21 +189,22 @@ class Invoice:
         self.doc.append(NoEscape('Variable & IAPS Reg.~Art. & Value \\\\'))
         self.doc.append(NoEscape('\\hline'))
         self.doc.append(NoEscape('&& \\\\'))
-        self.doc.append(NoEscape('Membership Type&3.4.3 & b \\\\'))
-        self.doc.append(NoEscape('Development Factor (d)&3.4.4.d & b \\\\'))
-        self.doc.append(NoEscape('GNI Atlas Method, $10^6$ USD (G)&3.4.2.c & b \\\\'))
+        self.doc.append(NoEscape(f'Membership Type&3.4.3 & {self.client.membership_type} \\\\'))
+        self.doc.append(NoEscape(f'GNI Atl.~Mtd.\\textsuperscript{1}, $10^6$ USD (G)&3.4.2.c & {self.client.gni_atlas_method} \\\\'))
+        self.doc.append(NoEscape(f'Development Factor\\textsuperscript{2} (d)&3.4.4.d & {self.client.development_factor} \\\\'))
         self.doc.append(NoEscape('&& \\\\'))
         self.doc.append(NoEscape('&& \\\\'))
 
         self.doc.append(NoEscape('Discount &IAPS Reg.~Art. & Factor \\\\'))
         self.doc.append(NoEscape('\\hline'))
         self.doc.append(NoEscape('&& \\\\'))
-        self.doc.append(NoEscape('LC &3.4.3.b& b \\\\'))
-        self.doc.append(NoEscape('First Year &3.4.4.b& b \\\\'))
-        self.doc.append(NoEscape('Probationary &3.4.4.a& b \\\\'))
-        self.doc.append(NoEscape('Econ. Downturn &3.4.4.d& b \\\\'))
-        self.doc.append(NoEscape('Total & & b \\\\'))
-        self.doc.append(NoEscape('\\end{tabular}'))
+        self.doc.append(NoEscape(f'LC &3.4.3.b& {self.client.discount_lc} \\\\'))
+        self.doc.append(NoEscape(f'First Year &3.4.4.b& {self.client.discount_first_year} \\\\'))
+        self.doc.append(NoEscape(f'Probationary &3.4.4.a& {self.client.discount_probationary} \\\\'))
+        self.doc.append(NoEscape(f'Economic Downturn &3.4.4.d& {self.client.discount_econ_downturn} \\\\'))
+        self.doc.append(NoEscape(f'Total (multiplicative)& 3.4 & {self.client.discount_lc * self.client.discount_first_year * self.client.discount_probationary * self.client.discount_econ_downturn} \\\\'))
+        self.doc.append(NoEscape('\\end{tabular} \\\\'))
+        self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(NewLine())
@@ -220,9 +222,26 @@ class Invoice:
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(Command('scriptsize'))
-        self.doc.append(NoEscape('Generated with the open-source IAPS Invoice Generator based on Python and \\LaTeX, available under \\\\'
-                                 '\\href{https://github.com/mu-gaimann/iaps-invoice-tool}{https://github.com/mu-gaimann/iaps-invoice-tool}. '
-                                 'Interested in contributing? Contact \\href{mailto:membership-fees@iaps.info}{membership-fees@iaps.info}.'))
+        self.sources = {'gni': 'https://api.worldbank.org/v2/en/indicator/NY.GNP.ATLS.CD?downloadformat=csv',
+                        'wesp_annex': 'https://www.un.org/development/desa/dpad/wp-content/uploads/sites/45/WESP2022\\_ANNEX.pdf'}
+
+        self.doc.append(NoEscape('\\textsuperscript{1} Gross National Income, Atlas Method (current USD). Source: \\href{'
+                                 f'{self.sources["gni"]}'
+                                 '}{The World Bank, \\\\'
+                                 f'{self.sources["gni"]}'
+                                 '}'))
+        self.doc.append(NewLine())
+        self.doc.append(NoEscape('\\textsuperscript{2} Source: \\href{'
+                                 f'{self.sources["wesp_annex"]}'
+                                 '}{United Nations,  Dept.~of Economic and Social Affairs, World Economic Situation and Prospects 2022,\\\\'
+                                 f'{self.sources["wesp_annex"]}'
+                                 '}'))
+        self.doc.append(NewLine())
+        self.doc.append(NewLine())
+        self.doc.append(NoEscape(
+            'Generated with the open-source IAPS Invoice Generator based on Python and \\LaTeX, available under \\\\'
+            '\\href{https://github.com/mu-gaimann/iaps-invoice-tool}{https://github.com/mu-gaimann/iaps-invoice-tool}. '
+            'Interested in contributing? Found a typo or a bug? You want to give feedback? Open an issue on GitHub or contact \\href{mailto:membership-fees@iaps.info}{membership-fees@iaps.info}.'))
         self.doc.append(Command('end', 'letter'))  # End of document
 
 
@@ -233,7 +252,7 @@ me = Member(settings.me['company'], settings.me['name'], settings.me['street'], 
 def get_invoice_id(financial_year, client):
     membership_type = client.membership_type
     if membership_type == 'NC':  # National Committee
-        descriptor = 'XXX'
+        descriptor = '000'
     elif membership_type == 'LC':  # Local Committee
         descriptor = client.city[:3].upper()
     elif membership_type == 'IM':  # Individual Member
@@ -247,23 +266,24 @@ def makeinvoice(client):
     financial_year = 2022
     item = Item(financial_year, client.fee)
     this_id = get_invoice_id(financial_year, client)
-    invoice = Invoice(client=client, items=[item], id=this_id, financial_year=financial_year)  # Rechnungsdokument erstellen
+    invoice = Invoice(client=client, items=[item], id=this_id,
+                      financial_year=financial_year)  # Rechnungsdokument erstellen
     invoice.generate()
 
 
 test_client_nc = {"company": "NC Antarctica", "name": "P. Enguin", "street": "South Pole 1", "postcode": "96420",
-               "city": "Ice City", "country": "Antarctica", "additional": "Cold District", "phone": "+99 17287 7832",
-               "email": "nc-antarctica@iaps.info", "fee": 123.45,
-               "country_code": "ATA", "membership_type": "NC", "fee_excl_discount": 420.00,
+                  "city": "Ice City", "country": "Antarctica", "additional": "Cold District", "phone": "+99 17287 7832",
+                  "email": "nc-antarctica@iaps.info", "fee": 123.45,
+                  "country_code": "ATA", "membership_type": "NC", "fee_excl_discount": 420.00,
                   "discount": 70, "discount_lc": 1.00,
                   "discount_first_year": 1.00, "discount_probationary": 0.50, "discount_econ_downturn": 1.00,
                   "development_factor": 0.50, "gni_atlas_method": 52341987.02}
 
-test_client_lc = test_client_nc
-test_client_nc["membership_type"] = "LC"
-test_client_nc["discount_lc"] = "0.33"
+test_client_lc = copy.deepcopy(test_client_nc)
+test_client_lc["membership_type"] = "LC"
+test_client_lc["discount_lc"] = "0.33"
 
-test_client_im = test_client_nc
+test_client_im = copy.deepcopy(test_client_nc)
 test_client_im.update({"firstname": "Paul", "lastname": "Enguin", "membership_type": "IM", "fee": 10.0})
 
 
