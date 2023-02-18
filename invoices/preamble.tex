@@ -6,7 +6,8 @@
 \usepackage{tabularx}
 \usepackage{fp}
 \usepackage{eurosym}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
+\usepackage{graphicx}
 
 
 \setkomavar{date}[Date]{\today}
@@ -16,6 +17,9 @@
 \setkomavar{fromemail}[]{\href{mailto:membership-fees@iaps.info}{membership-fees@iaps.info}}
 \setkomavar{fromaddress}[]{6 Rue des Frères Lumière \\ 68200 Mulhouse, France}
 \setkomavar{fromurl}[]{\href{https://www.iaps.info}{www.iaps.info}}
+\setkomavar{backaddress}[]{\usekomavar*{fromname}, \usekomavar{fromaddress}}
+\setkomavar{fromlogo}{\includegraphics{iaps-logo}}
+\setkomavar{nextfoot}{{\usekomavar{firstfoot}}}
 
 \newcommand{\frombank}{Caisse d'Epargne Grand Est Europe}
 \newcommand{\frombankaddress}{34 Avenue du Général Leclerc}
@@ -53,8 +57,7 @@
 		 \hline\\
 		 Bank: &\frombank \\
 		 Address: &\frombankaddress \\
-		 &\frombankaddressTwo \\
-		 Phone: &\frombankphone \\ \\
+		 &\frombankaddressTwo \\ \\
 
 		 IBAN: &\fromiban \\
 		 SWIFT: &\frombic \\
