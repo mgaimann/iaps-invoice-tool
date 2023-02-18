@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import zlib
 
-from pylatex import Document, Command, UnsafeCommand, LineBreak, NewLine, NewPage  # Latex stuff
+from pylatex import Document, Command, UnsafeCommand, LineBreak, NewLine, NewPage, Math  # Latex stuff
 from pylatex.utils import NoEscape  # More Latex Stuff
 import time
 import settings
@@ -35,7 +35,10 @@ def _(s):
 class Member:
     def __init__(self, company=None, name=None, street=None, postcode=None, city=None, country=None, additional=None,
                  phone=None, email=None, fee=None, country_code=None, membership_type=None
-                 , firstname=None, lastname=None):
+                 , firstname=None, lastname=None,
+                 fee_excl_discount=None, discount=None, discount_lc=None, discount_first_year=None,
+                 discount_probationary=None, discount_econ_downturn=None, development_factor=None,
+                 gni_atlas_method=None):
         self.company = company
         self.name = name
         self.street = street
@@ -47,9 +50,17 @@ class Member:
         self.phone = phone
         self.email = email
         self.fee = fee
+        self.fee_excl_discount = fee_excl_discount
+        self.discount = discount
         self.membership_type = membership_type
         self.firstname = firstname
         self.lastname = lastname
+        self.discount_lc = discount_lc
+        self.discount_first_year = discount_first_year
+        self.discount_probationary = discount_probationary
+        self.discount_econ_downturn = discount_econ_downturn
+        self.development_factor = development_factor
+        self.gni_atlas_method = gni_atlas_method
 
     def getaddress(self):
         if self.membership_type != "IM":
@@ -64,7 +75,7 @@ class Member:
 class Item:
     def __init__(self, financial_year=None, price=None):
         self.qt = 1
-        self.desc = f'IAPS Membership Fee {financial_year}'
+        self.desc = f'IAPS Membership Fee {financial_year}/{financial_year + 1}'
         self.price = price
 
 
@@ -138,6 +149,9 @@ class Invoice:
         # self.doc.append(NoEscape(self.statictext['tvat']))  # VAT
         self.doc.append(NoEscape(self.statictext['ttotal']))  # Total = VAT + sum
         self.doc.append(Command('end', 'spreadtab'))  # End of table
+        self.doc.append(NewLine())
+        self.doc.append(NewLine())
+        self.doc.append(NewLine())
         self.doc.append(
             'Please settle the invoice within 14 days after receipt. '
             'Please use a wire transfer to pay the invoice in a single transaction, otherwise Paypal '
@@ -154,8 +168,61 @@ class Invoice:
 
         self.doc.append(NewLine())
         self.doc.append(NewLine())
-        self.doc.append('Your membership fee explained (IAPS Regulations Article 8.4):')
+        self.doc.append(NewLine())
+        self.doc.append('Your membership fee explained (IAPS Regulations Article 3.4.1):')
+        self.doc.append(NewLine())
+        self.doc.append(NewLine())
+        self.doc.append(NewLine())
+        self.doc.append(NoEscape('\\begin{tabular}{lll}'))
+        self.doc.append(NoEscape('Membership Type & IAPS Reg.~Art. & Calculation Method \\\\'))
+        self.doc.append(NoEscape('\\hline'))
+        self.doc.append(NoEscape('&& \\\\'))
+        self.doc.append(NoEscape('LC/NC & 3.4.3.ab & Formula, in EUR \\\\'))
+        self.doc.append(NoEscape(' & & $\\min (d \\cdot (75 + 2 \\cdot \\sqrt[3]{G}, 400))$ \\\\'))
+        self.doc.append(NoEscape('IM & 3.4.3.c & Fixed Amount, EUR 10.00 \\\\'))
+        self.doc.append(NoEscape('&& \\\\'))
+        self.doc.append(NoEscape('&& \\\\'))
+        # min(d · (75 + 2 ∗ 3
+        # p(G), 400))
 
+        self.doc.append(NoEscape('Variable & IAPS Reg.~Art. & Value \\\\'))
+        self.doc.append(NoEscape('\\hline'))
+        self.doc.append(NoEscape('&& \\\\'))
+        self.doc.append(NoEscape('Membership Type&3.4.3 & b \\\\'))
+        self.doc.append(NoEscape('Development Factor (d)&3.4.4.d & b \\\\'))
+        self.doc.append(NoEscape('GNI Atlas Method, $10^6$ USD (G)&3.4.2.c & b \\\\'))
+        self.doc.append(NoEscape('&& \\\\'))
+        self.doc.append(NoEscape('&& \\\\'))
+
+        self.doc.append(NoEscape('Discount &IAPS Reg.~Art. & Factor \\\\'))
+        self.doc.append(NoEscape('\\hline'))
+        self.doc.append(NoEscape('&& \\\\'))
+        self.doc.append(NoEscape('LC &3.4.3.b& b \\\\'))
+        self.doc.append(NoEscape('First Year &3.4.4.b& b \\\\'))
+        self.doc.append(NoEscape('Probationary &3.4.4.a& b \\\\'))
+        self.doc.append(NoEscape('Econ. Downturn &3.4.4.d& b \\\\'))
+        self.doc.append(NoEscape('Total & & b \\\\'))
+        self.doc.append(NoEscape('\\end{tabular}'))
+        self.doc.append(NewLine())
+        self.doc.append(NewLine())
+        self.doc.append(NewLine())
+        self.doc.append(NewLine())
+        self.doc.append("For the IAPS Executive Committee sincerely,")
+        self.doc.append(NewLine())
+        self.doc.append(NewLine())
+        self.doc.append(NewLine())
+        self.doc.append(NoEscape('\\begin{tabular}{c@{\hskip 3cm}c}'))
+        self.doc.append(NoEscape("Mario Gaimann & Max Peters \\\\"))
+        self.doc.append(NoEscape("IAPS Treasurer 2022/23 & Membership Fees Officer 2022/23 \\\\"))
+        self.doc.append(NoEscape('\\end{tabular}'))
+        self.doc.append(NewLine())
+        self.doc.append(NewLine())
+        self.doc.append(NewLine())
+        self.doc.append(NewLine())
+        self.doc.append(Command('scriptsize'))
+        self.doc.append(NoEscape('Generated with the open-source IAPS Invoice Generator based on Python and \\LaTeX, available under \\\\'
+                                 '\\href{https://github.com/mu-gaimann/iaps-invoice-tool}{https://github.com/mu-gaimann/iaps-invoice-tool}. '
+                                 'Interested in contributing? Contact \\href{mailto:membership-fees@iaps.info}{membership-fees@iaps.info}.'))
         self.doc.append(Command('end', 'letter'))  # End of document
 
 
@@ -177,7 +244,7 @@ def get_invoice_id(financial_year, client):
 
 
 def makeinvoice(client):
-    financial_year = '2022'
+    financial_year = 2022
     item = Item(financial_year, client.fee)
     this_id = get_invoice_id(financial_year, client)
     invoice = Invoice(client=client, items=[item], id=this_id, financial_year=financial_year)  # Rechnungsdokument erstellen
@@ -187,21 +254,21 @@ def makeinvoice(client):
 test_client_nc = {"company": "NC Antarctica", "name": "P. Enguin", "street": "South Pole 1", "postcode": "96420",
                "city": "Ice City", "country": "Antarctica", "additional": "Cold District", "phone": "+99 17287 7832",
                "email": "nc-antarctica@iaps.info", "fee": 123.45,
-               "country_code": "ATA", "membership_type": "NC"}
+               "country_code": "ATA", "membership_type": "NC", "fee_excl_discount": 420.00,
+                  "discount": 70, "discount_lc": 1.00,
+                  "discount_first_year": 1.00, "discount_probationary": 0.50, "discount_econ_downturn": 1.00,
+                  "development_factor": 0.50, "gni_atlas_method": 52341987.02}
 
-test_client_lc = {"company": "NC Antarctica", "name": "P. Enguin", "street": "South Pole 1", "postcode": "96420",
-               "city": "Ice City", "country": "Antarctica", "additional": "Cold District", "phone": "+99 17287 7832",
-               "email": "nc-antarctica@iaps.info", "fee": 123.45,
-               "country_code": "ATA", "membership_type": "LC"}
+test_client_lc = test_client_nc
+test_client_nc["membership_type"] = "LC"
+test_client_nc["discount_lc"] = "0.33"
 
-test_client_im = {"firstname": "Paul", "lastname": "Enguin", "street": "South Pole 1", "postcode": "96420",
-               "city": "Ice City", "country": "Antarctica", "additional": "Cold District", "phone": "+99 17287 7832",
-               "email": "nc-antarctica@iaps.info", "fee": 123.45,
-               "country_code": "ATA", "membership_type": "IM"}
+test_client_im = test_client_nc
+test_client_im.update({"firstname": "Paul", "lastname": "Enguin", "membership_type": "IM", "fee": 10.0})
 
 
 def main():
-    client = Member(**test_client_im)
+    client = Member(**test_client_nc)
     makeinvoice(client=client)
 
 
