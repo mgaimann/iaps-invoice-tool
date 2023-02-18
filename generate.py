@@ -59,24 +59,18 @@ class Invoice:
         self.items = items if items is not None else []
         self.filename = self.id + '-' + time.strftime('%Y')
         self.documentclass = None
-        self.docoptions = 'DIN,pagenumber=false,parskip=half,fromalign=right,fromphone=true,fromfax=false,fromrule=false,fontsize=12pt'
+        self.docoptions = 'DIN,pagenumber=false,parskip=half,fromalign=right,fromphone=false,fromurl=true,fromfax=false,fromrule=false,fontsize=12pt'
         self.doc = None
-        if offer is True:
-            self.setoffer()
-        else:
-            self.categroy = ['Rechnung', 'Rechnungsnummer']
+        self.category = ['Invoice', 'Invoice Number']
         self.statictext = {
             'tdef': '\\begin{spreadtab}{{tabularx}{\linewidth}{lXrr}}',
             'thead': '@ Anzahl & @ Beschreibung & @ Einzelpreis & @ Gesamtpreis \\\\ \\hline',
             'temptyrow': '@ & @ & @ & @ \\\\',
             'tsep': '\\\\ \\hline \\hline \\\\',
-            'tsum': ' & & @ Nettobetrag Gesamt & :={sum(d2:[0,-3])} \\euro \\\\',
+            'tsum': ' & & @ Sub-total & :={sum(d2:[0,-3])} \\euro \\\\',
             'tvat': ' & & @ MwSt. 19\% & :={[0,-1]*0.19+0.00} \\euro \\\\',
-            'ttotal': ' & & @ Bruttobetrag Gesamt & :={sum([0,-2]:[0,-1])} \\euro \\\\'
+            'ttotal': ' & & @ Total & :={sum([0,-2]:[0,-1])} \\euro \\\\'
         }
-
-    def setoffer(self):
-        self.categroy = ['Angebot', 'Angebotsnummer']
 
     def setuplatex(self):
         self.filename = self.id + '-' + time.strftime('%Y')
@@ -86,7 +80,7 @@ class Invoice:
         self.doc.preamble.append(Command('LoadLetterOption', 'template'))
         self.doc.preamble.append(Command('setkomavar', arguments='subject', extra_arguments=self.subject))
         self.doc.preamble.append(
-            Command('setkomavar', arguments='yourmail', options=self.categroy[1], extra_arguments=self.filename))
+            Command('setkomavar', arguments='yourmail', options=self.category[1], extra_arguments=self.filename))
         # Falls man Kundennummer implementieren möchte.
         # %\setkomavar{yourref}[Ihre Kundennummer]{263}
 
@@ -122,7 +116,7 @@ class Invoice:
         self.doc.append(NoEscape(self.statictext['tsum']))  # Sum of all items
         if self.discount != 0:
             self.doc.append(NoEscape(self.statictext['tdiscount']))
-        self.doc.append(NoEscape(self.statictext['tvat']))  # VAT
+        # self.doc.append(NoEscape(self.statictext['tvat']))  # VAT
         self.doc.append(NoEscape(self.statictext['ttotal']))  # Total = VAT + sum
         self.doc.append(Command('end', 'spreadtab'))  # End of table
         self.doc.append(
@@ -140,12 +134,6 @@ class Invoice:
 
 me = Member(settings.me['company'], settings.me['name'], settings.me['street'], settings.me['postcode'],
             settings.me['city'])
-
-main_menu = [
-    {'tag': False, 'label': _('Rechnung')},
-    {'tag': True, 'label': _('Angebot')}
-]
-
 
 def makeinvoice(client, offer=False):
     invoice = Invoice(client=client, offer=offer)  # Rechnungsdokument erstellen

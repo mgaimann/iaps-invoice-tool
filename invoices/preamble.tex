@@ -6,21 +6,24 @@
 \usepackage{tabularx}
 \usepackage{fp}
 \usepackage{eurosym}
+\usepackage{hyperref}
 
 
 \setkomavar{date}[Date]{\today}
 %\renewcommand*{\raggedsignature}{\raggedright}
 
-\setkomavar{fromname}{The International Association of Physics Students}
-\setkomavar{fromemail}{membership-fees@iaps.info}
-\setkomavar{fromaddress}{6 Rue des Frères Lumière \\ 68200 Mulhouse, France}
+\setkomavar{fromname}[IAPS]{The International Association of Physics Students}
+\setkomavar{fromemail}[]{\href{mailto:membership-fees@iaps.info}{membership-fees@iaps.info}}
+\setkomavar{fromaddress}[]{6 Rue des Frères Lumière \\ 68200 Mulhouse, France}
+\setkomavar{fromurl}[]{\href{https://www.iaps.info}{www.iaps.info}}
+
 \newcommand{\frombank}{Caisse d'Epargne Grand Est Europe}
 \newcommand{\frombankaddress}{34 Avenue du Général Leclerc}
 \newcommand{\frombankaddressTwo}{68100 Mulhouse, France}
 \newcommand{\frombankphone}{+33 389326141}
 \newcommand{\fromiban}{DE00 0000 0000 0000 0000 00}
 \newcommand{\frombic}{CEPAFRPP513}
-\newcommand{\frompaypal}{iaps@eps.org}
+\newcommand{\frompaypal}{\href{https://t1p.de/iaps-mfees}{t1p.de/iaps-mfees}}
 
 
 \setkomavar{firstfoot}{
@@ -41,7 +44,7 @@
 		 Contact: &Max Peters \\  \\
 
 		 E-Mail: &\usekomavar{fromemail}  \\
-		Website: &www.iaps.info\\
+		Website: &\usekomavar{fromurl} \\
 	\end{tabular}
 
 	 \hfill{}
@@ -55,7 +58,7 @@
 
 		 IBAN: &\fromiban \\
 		 SWIFT: &\frombic \\
-		 Paypal: &\frompaypal \\
+		 Paypal/CC: &\frompaypal \\
 	 \end{tabular}
 
  }}
