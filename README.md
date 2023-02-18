@@ -1,5 +1,5 @@
 # IAPS invoice tool
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/mu-gaimann/iaps-invoice-tool/)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/mu-gaimann/iaps-invoice-tool/) [not yet implemented]
 
 Generate nice PDF invoices for IAPS, with LaTeX and Python
 
@@ -7,7 +7,7 @@ Based on previous work by @loelkes
 
 ## Motivation
 The [International Association of Physics Students (IAPS)](https://www.iaps.info/) is an organization for the global physics students community with over 90,000 members. 
-It is organized in individual, local and national memberships and run by volunteers like me.
+It is organized in individual, local and national memberships and run by volunteers.
 IAPS collects membership fees which are computed according to a membership formula, specified in its Charter and Regulations.
 
 Previously, these invoices were tediously written by hand, using Word documents, and sent out manually by email.

@@ -125,9 +125,9 @@ class Invoice:
             '(IAPS Regulations Article 3.4.5). If you wish to apply for a reduction of your membership fee '
             'in the event of national severe economic downturn due to a global catastrophe '
             '(IAPS Regulations Article 3.4.4.d), this must be done within 14 days of receipt of this invoice '
-            '(Resolution EC/2022-23/XX). '
+            '(IAPS EC Resolution EC/2022-23/XX). '
             'Failure to pay the invoice by June 1 will result in the irrevocable loss of voting rights '
-            'at the Annual General Meeting in the current financial year (IAPS Charter Article 8.3) and may '
+            'at the Annual General Meeting for the current financial year (IAPS Charter Article 8.3) and may '
             'lead to membership termination through expulsion (IAPS Charter Article 9.1.4).')
         self.doc.append(Command('end', 'letter'))  # End of document
 
