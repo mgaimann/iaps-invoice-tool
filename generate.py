@@ -265,11 +265,12 @@ me = Member(settings.me['company'], settings.me['name'], settings.me['street'], 
 def get_invoice_id(financial_year, client):
     membership_type = client.membership_type
     if membership_type == 'NC':  # National Committee
-        descriptor = '000'
+        descriptor = '0000'
     elif membership_type == 'LC':  # Local Committee
-        descriptor = client.city[:3].upper()
+        descriptor = ''.join(filter(str.isalpha, client.city))  # allow only letters
+        descriptor = descriptor[:4].upper()
     elif membership_type == 'IM':  # Individual Member
-        descriptor = client.lastname.upper() + client.firstname.upper()
+        descriptor = client.lastname.upper()[:3] + client.firstname.upper()[:3] + client.postcode[-2:]
     else:
         raise ValueError('Unknown membership type')
     return f'INV-{financial_year}-{membership_type}-{client.country_code}-{descriptor}'
@@ -285,7 +286,7 @@ def makeinvoice(client):
 
 
 test_client_nc = {"company": "NC Antarctica", "name": "P. Enguin", "street": "South Pole 1", "postcode": "96420",
-                  "city": "Ice City", "country": "Antarctica", "additional": "Cold District", "phone": "+99 17287 7832",
+                  "city": "St. Ice", "country": "Antarctica", "additional": "Cold District", "phone": "+99 17287 7832",
                   "email": "nc-antarctica@iaps.info", "fee": 93.50,
                   "country_code": "ATA", "membership_type": "NC", "fee_excl_discount": 187.00,
                   "discount_lc": 1.00,
@@ -294,14 +295,14 @@ test_client_nc = {"company": "NC Antarctica", "name": "P. Enguin", "street": "So
 
 test_client_lc = copy.deepcopy(test_client_nc)
 test_client_lc["membership_type"] = "LC"
-test_client_lc["discount_lc"] = "0.33"
+test_client_lc["discount_lc"] = 0.33
 
 test_client_im = copy.deepcopy(test_client_nc)
 test_client_im.update({"firstname": "Paul", "lastname": "Enguin", "membership_type": "IM", "fee": 10.0})
 
 
 def main():
-    client = Member(**test_client_nc)
+    client = Member(**test_client_im)
     makeinvoice(client=client)
 
 
