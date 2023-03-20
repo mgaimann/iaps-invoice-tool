@@ -69,9 +69,10 @@ class Member:
     def getaddress(self):
         output = ''
         if self.membership_type != "Individual Member (IM)":
-            output += str(self.society) + '\n'
             if self.careof is not np.nan:
                 output += str(self.careof) + '\n'
+            else:
+                output += str(self.society) + '\n'
         elif self.membership_type == "Individual Member (IM)":
             output += f"{self.lastname}, {self.firstname}" + '\n'
         else:
@@ -89,9 +90,9 @@ class Member:
 
 
 class Item:
-    def __init__(self, financial_year=None, price=None):
+    def __init__(self, financial_year=None, price=None, member_name=None):
         self.qt = 1.00
-        self.desc = f'IAPS Membership Fee {financial_year}/{financial_year + 1} *'
+        self.desc = f'IAPS Membership Fee {financial_year}/{financial_year + 1} for the {member_name} *'
         self.price = price
 
 
@@ -170,28 +171,31 @@ class Invoice:
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(NewLine())
+        self.doc.append(NewPage())
+        self.doc.append(Command('begin', 'small'))
         self.doc.append(NoEscape(
             'Please settle the invoice within 14 days after receipt, \\textbf{using the invoice number as reference}. '
             'Please use a wire transfer to pay the invoice in a single transaction, otherwise Paypal '
-            '(IAPS Regulations Article 3.4.5). '))
-        self.doc.append(NewPage())
+            '(IAPS Regulations Article 3.4.5).\\'))
+        self.doc.append(NewLine())
         self.doc.append(
             'Remarks: If you wish to apply for a reduction of your membership fee '
             'in the event of national severe economic downturn due to a global catastrophe '
             '(IAPS Regulations Article 3.4.4.d), this must be done within 14 days of receipt of this invoice '
             '(IAPS EC Resolution EC/2022-23/122). '
-            'Failure to pay the invoice by June 1 will result in the irrevocable loss of voting rights '
+            'Failure to pay the invoice by June 1 may result in the loss of voting rights '
             'at the Annual General Meeting for the current financial year (IAPS Charter Article 8.3) and may '
             'lead to membership termination through expulsion (IAPS Charter Article 9.1.4).')
 
         self.doc.append(NewLine())
+        self.doc.append(Command('end', 'small'))
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append('* Your membership fee explained (IAPS Regulations Article 3.4.1):')
+        self.doc.append(NewLine())
+        self.doc.append(NewLine())
+        self.doc.append(NewLine())
         self.doc.append(Command('begin', 'footnotesize'))
-        self.doc.append(NewLine())
-        self.doc.append(NewLine())
-        self.doc.append(NewLine())
         self.doc.append(NoEscape('\\begin{tabular}{lll}'))
         self.doc.append(NoEscape('Membership Type & IAPS Reg.~Art. & Calculation Method \\\\'))
         self.doc.append(NoEscape('\\hline'))
@@ -276,7 +280,7 @@ me = Member(settings.me['company'], settings.me['name'], settings.me['street'], 
 
 def get_invoice_id(financial_year, client):
     membership_type = client.membership_type
-    if membership_type == 'National Commitee (NC)':  # National Committee [spelling error]
+    if membership_type == 'National Committee (NC)':
         short_membership_type = 'NC'
         descriptor = '0000'
     elif membership_type == 'Local Committee (LC)':  # Local Committee
@@ -296,7 +300,11 @@ def get_invoice_id(financial_year, client):
 
 def makeinvoice(client):
     financial_year = 2022
-    item = Item(financial_year, client.fee_excl_discount)
+    if client.membership_type != 'Individual Member (IM)':
+        member_name = client.society
+    else:
+        member_name = f"IM {client.lastname}, {client.firstname}"
+    item = Item(financial_year, client.fee_excl_discount, member_name=member_name)
     this_id = get_invoice_id(financial_year, client)
     invoice = Invoice(client=client, items=[item], id=this_id,
                       financial_year=financial_year)  # Rechnungsdokument erstellen

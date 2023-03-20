@@ -5,9 +5,11 @@ from generate import Member, makeinvoice
 
 # read csv and determine identifiers
 df = pd.read_csv("data/membership-form.csv", skiprows=0, header='infer', delimiter=',')
-
 gni_df = pd.read_csv("data/gni_data.csv", skiprows=3, header='infer', delimiter=',')
 wesp_df = pd.read_csv("data/wesp_data.csv", skiprows=4, header='infer', delimiter=',')
+
+# fix a typo
+df.iloc[:, 3].replace(['National Commitee (NC)'],  ['National Committee (NC)'], inplace=True)
 
 # collect gni data
 df['country'] = None
@@ -36,7 +38,7 @@ for index, row in df.iterrows():
     # gni atlas method
     gni = gni_df[gni_df['Country Name'] == df.at[index, 'country']]['LATEST DATA']
     try:
-        df.at[index, 'gni_atlas_method'] = gni.values[0] / 10**6
+        df.at[index, 'gni_atlas_method'] = gni.values[0] / 10 ** 6
     except IndexError:
         df.at[index, 'gni_atlas_method'] = 0.0
 
