@@ -7,6 +7,7 @@ from pylatex.utils import NoEscape  # More Latex Stuff
 import time
 import settings
 import numpy as np
+import random
 
 latex_preamble = 'preamble.tex'
 pdflatex = '/usr/bin/pdflatex'
@@ -285,7 +286,7 @@ def get_invoice_id(financial_year, client):
     elif membership_type == 'Individual Member (IM)':  # Individual Member
         short_membership_type = 'IM'
         try:
-            descriptor = client.lastname.upper()[:3] + client.firstname.upper()[:3] + client.postcode[-2:]
+            descriptor = client.lastname.upper()[:3] + client.firstname.upper()[:3]
         except AttributeError:
             descriptor = 'INVALID-DESCRIPTOR'
     else:

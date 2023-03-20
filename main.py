@@ -94,8 +94,8 @@ for index, row in df.iterrows():
     client = Member(
         society=row.iloc[5],
         careof=row.iloc[22],
-        firstname=row.iloc[32],
-        lastname=row.iloc[33],
+        firstname=row.iloc[34],
+        lastname=row.iloc[35],
         street=row.iloc[23],
         additional=row.iloc[24],
         postcode=row.iloc[25],
