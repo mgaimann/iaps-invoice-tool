@@ -6,7 +6,7 @@ from pylatex import Document, Command, UnsafeCommand, LineBreak, NewLine, NewPag
 from pylatex.utils import NoEscape  # More Latex Stuff
 import time
 import settings
-
+import numpy as np
 
 latex_preamble = 'preamble.tex'
 pdflatex = '/usr/bin/pdflatex'
@@ -66,13 +66,22 @@ class Member:
         self.gni_atlas_method = gni_atlas_method
 
     def getaddress(self):
+        output = ''
         if self.membership_type != "Individual Member (IM)":
-            output = str(self.society) + '\n' + str(self.careof) + '\n' + str(self.street) + '\n' + str(self.additional) + '\n' + str(self.postcode) + ' ' + str(self.city) + '\n' + str(self.additional) + '\n'+ str(self.country)
+            output += str(self.society) + '\n'
+            if self.careof is not np.nan:
+                output += str(self.careof) + '\n'
         elif self.membership_type == "Individual Member (IM)":
-            output = f"{self.lastname}, {self.firstname}" + '\n' + str(self.careof) + '\n' + str(self.street) + '\n' + str(self.additional) + '\n' \
-                     + str(self.postcode) + ' ' + str(self.city) + '\n' + str(self.district) + '\n' + str(self.country)
+            output += f"{self.lastname}, {self.firstname}" + '\n'
         else:
             raise ValueError("Membership type not set")
+        output += str(self.street) + '\n'
+        if self.additional is not np.nan:
+            output += str(self.additional) + '\n'
+        output += str(self.postcode) + '  ' + str(self.city) + '\n'
+        if self.district is not np.nan:
+            output += str(self.district) + '\n'
+        output += str(self.country)
         return output
 
 
