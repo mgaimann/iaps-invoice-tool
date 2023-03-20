@@ -34,14 +34,14 @@ def _(s):
 
 
 class Member:
-    def __init__(self, company=None, name=None, street=None, postcode=None, city=None, country=None, additional=None,
+    def __init__(self, society=None, careof=None, street=None, postcode=None, city=None, district=None, country=None, additional=None,
                  phone=None, email=None, fee=None, country_code=None, membership_type=None
                  , firstname=None, lastname=None,
                  fee_excl_discount=None, discount=None, discount_lc=1.0, discount_first_year=1.0,
                  discount_probationary=1.0, discount_econ_downturn=1.0, development_factor=1.0,
                  gni_atlas_method=None):
-        self.company = company
-        self.name = name
+        self.society = society
+        self.careof = careof
         self.street = street
         self.additional = additional
         self.postcode = postcode
@@ -66,7 +66,7 @@ class Member:
 
     def getaddress(self):
         if self.membership_type != "IM":
-            output = self.company + '\n' + self.name + '\n' + self.street + '\n' + self.postcode + ' ' + self.city + '\n' + self.country
+            output = self.society + '\n' + self.careof + '\n' + self.street + '\n' + self.postcode + ' ' + self.city + '\n' + self.country
         elif self.membership_type == "IM":
             output = f"{self.firstname} {self.lastname}" + '\n' + self.street + '\n' + self.postcode + ' ' + self.city + '\n' + self.country
         else:
