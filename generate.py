@@ -79,7 +79,9 @@ class Member:
         output += str(self.street) + '\n'
         if self.additional is not np.nan:
             output += str(self.additional) + '\n'
-        output += str(self.postcode) + '  ' + str(self.city) + '\n'
+        if self.postcode is not np.nan:
+            output += str(self.postcode) + '  '
+        output += str(self.city) + '\n'
         if self.district is not np.nan:
             output += str(self.district) + '\n'
         output += str(self.country)
