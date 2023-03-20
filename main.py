@@ -7,7 +7,7 @@ from generate import Member, makeinvoice
 df = pd.read_csv("data/membership-form.csv", skiprows=0, header='infer', delimiter=',')
 
 gni_df = pd.read_csv("data/gni_data.csv", skiprows=3, header='infer', delimiter=',')
-wesp_df = pd.read_csv("data/wesp_data.csv", skiprows=3, header='infer', delimiter=',')
+wesp_df = pd.read_csv("data/wesp_data.csv", skiprows=4, header='infer', delimiter=',')
 
 
 # collect gni data
@@ -22,14 +22,30 @@ df['discount_probationary'] = None
 df['fee'] = None
 df['fee_excl_discount'] = None
 
+# compute quantities for each association
 for index, row in df.iterrows():
     df.at[index, 'country'] = row.iloc[7].strip()
+
+    # country code
     country_code = gni_df[gni_df['Country Name'] == df.at[index, 'country']]['Country Code']
     try:
         df.at[index, 'country_code'] = country_code.values[0]
     except IndexError:
         df.at[index, 'country_code'] = None
 
+    # gni atlas method
+    gni = gni_df[gni_df['Country Name'] == df.at[index, 'country']]['LATEST DATA']
+    try:
+        df.at[index, 'gni_atlas_method'] = gni.values[0]
+    except IndexError:
+        df.at[index, 'gni_atlas_method'] = None
+
+    # development factor
+    country_is_in_wesp_list = wesp_df[wesp_df['Table A'] == df.at[index, 'country']]['Table A']
+    if country_is_in_wesp_list.empty:
+        df.at[index, 'development_factor'] = 0.5
+    else:
+        df.at[index, 'development_factor'] = 1.0
 
 for index, row in df.iterrows():
     client = Member(
