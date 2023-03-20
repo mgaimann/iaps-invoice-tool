@@ -37,7 +37,7 @@ class Member:
     def __init__(self, society=None, careof=None, street=None, postcode=None, city=None, district=None, country=None, additional=None,
                  phone=None, email=None, fee=None, country_code=None, membership_type=None
                  , firstname=None, lastname=None,
-                 fee_excl_discount=None, discount=None, discount_lc=1.0, discount_first_year=1.0,
+                 fee_excl_discount=None, discount=None, discount_total=None, discount_lc=1.0, discount_first_year=1.0,
                  discount_probationary=1.0, discount_econ_downturn=1.0, development_factor=1.0,
                  gni_atlas_method=None):
         self.society = society
@@ -46,6 +46,7 @@ class Member:
         self.additional = additional
         self.postcode = postcode
         self.city = city
+        self.district = district
         self.country = country
         self.country_code = country_code
         self.phone = phone
@@ -60,15 +61,16 @@ class Member:
         self.discount_first_year = discount_first_year
         self.discount_probationary = discount_probationary
         self.discount_econ_downturn = discount_econ_downturn
-        self.total_discount_factor = self.discount_lc * self.discount_first_year * self.discount_probationary * self.discount_econ_downturn
+        self.discount_total = discount_total
         self.development_factor = development_factor
         self.gni_atlas_method = gni_atlas_method
 
     def getaddress(self):
-        if self.membership_type != "IM":
-            output = self.society + '\n' + self.careof + '\n' + self.street + '\n' + self.postcode + ' ' + self.city + '\n' + self.country
-        elif self.membership_type == "IM":
-            output = f"{self.firstname} {self.lastname}" + '\n' + self.street + '\n' + self.postcode + ' ' + self.city + '\n' + self.country
+        if self.membership_type != "Individual Member (IM)":
+            output = str(self.society) + '\n' + str(self.careof) + '\n' + str(self.street) + '\n' + str(self.additional) + '\n' + str(self.postcode) + ' ' + str(self.city) + '\n' + str(self.additional) + '\n'+ str(self.country)
+        elif self.membership_type == "Individual Member (IM)":
+            output = f"{self.lastname}, {self.firstname}" + '\n' + str(self.careof) + '\n' + str(self.street) + '\n' + str(self.additional) + '\n' \
+                     + str(self.postcode) + ' ' + str(self.city) + '\n' + str(self.district) + '\n' + str(self.country)
         else:
             raise ValueError("Membership type not set")
         return output
@@ -122,7 +124,7 @@ class Invoice:
         self.setuplatex()
         self.discount = self.client.fee_excl_discount - self.client.fee
         self.discount = 0 if self.discount == '' else int(self.discount)
-        discount_percentage = round(100 - self.client.total_discount_factor * 100, 4)
+        discount_percentage = round(100 - self.client.discount_total * 100, 4)
         self.statictext['tdiscount'] = NoEscape(
             ' & & @ \\textdaggerdbl~Discount ' + f'{discount_percentage:.2f}\,\% & '
                                  f' @{self.discount:.2f} EUR \\\\')
@@ -210,7 +212,7 @@ class Invoice:
         self.doc.append(NoEscape(f'First Year &3.4.4.b& {self.client.discount_first_year} \\\\'))
         self.doc.append(NoEscape(f'Probationary &3.4.4.a& {self.client.discount_probationary} \\\\'))
         self.doc.append(NoEscape(f'Economic Downturn &3.4.4.d& {self.client.discount_econ_downturn} \\\\'))
-        self.doc.append(NoEscape(f'\\textdaggerdbl~Total (multiplicative)  & 3.4 & {self.client.total_discount_factor} \\\\'))
+        self.doc.append(NoEscape(f'\\textdaggerdbl~Total (multiplicative)  & 3.4 & {self.client.discount_total} \\\\'))
         self.doc.append(NoEscape('\\end{tabular} \\\\'))
         self.doc.append(NewLine())
         self.doc.append(NewLine())
@@ -264,16 +266,22 @@ me = Member(settings.me['company'], settings.me['name'], settings.me['street'], 
 
 def get_invoice_id(financial_year, client):
     membership_type = client.membership_type
-    if membership_type == 'NC':  # National Committee
+    if membership_type == 'National Commitee (NC)':  # National Committee [spelling error]
+        short_membership_type = 'NC'
         descriptor = '0000'
-    elif membership_type == 'LC':  # Local Committee
+    elif membership_type == 'Local Committee (LC)':  # Local Committee
+        short_membership_type = 'LC'
         descriptor = ''.join(filter(str.isalpha, client.city))  # allow only letters
         descriptor = descriptor[:4].upper()
-    elif membership_type == 'IM':  # Individual Member
-        descriptor = client.lastname.upper()[:3] + client.firstname.upper()[:3] + client.postcode[-2:]
+    elif membership_type == 'Individual Member (IM)':  # Individual Member
+        short_membership_type = 'IM'
+        try:
+            descriptor = client.lastname.upper()[:3] + client.firstname.upper()[:3] + client.postcode[-2:]
+        except AttributeError:
+            descriptor = 'INVALID-DESCRIPTOR'
     else:
         raise ValueError('Unknown membership type')
-    return f'INV-{financial_year}-{membership_type}-{client.country_code}-{descriptor}'
+    return f'INV-{financial_year}-{short_membership_type}-{client.country_code}-{descriptor}'
 
 
 def makeinvoice(client):
