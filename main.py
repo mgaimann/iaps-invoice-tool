@@ -36,7 +36,7 @@ for index, row in df.iterrows():
     # gni atlas method
     gni = gni_df[gni_df['Country Name'] == df.at[index, 'country']]['LATEST DATA']
     try:
-        df.at[index, 'gni_atlas_method'] = gni.values[0]
+        df.at[index, 'gni_atlas_method'] = gni.values[0] / 10**6
     except IndexError:
         df.at[index, 'gni_atlas_method'] = 0.0
 
@@ -80,7 +80,7 @@ for index, row in df.iterrows():
     if df.iloc[index, 3] != 'Individual Member (IM)':
         df.at[index, 'fee_excl_discount'] = \
             np.min([400, df.at[index, 'development_factor'] * (
-                    75 + 2 * (df.at[index, 'gni_atlas_method'] / 10 ** 6) ** (1 / 3))])
+                    75 + 2 * (df.at[index, 'gni_atlas_method']) ** (1 / 3))])
 
         df.at[index, 'fee'] = df.at[index, 'discount_total'] * df.at[index, 'fee_excl_discount']
 
