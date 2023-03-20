@@ -160,12 +160,10 @@ class Invoice:
         self.additems()  # All the items
         self.doc.append(NoEscape(self.statictext['tsep']))  # Seperator row
         self.doc.append(NoEscape(self.statictext['tsum']))  # Sum of all items
-        if self.discount != 0:
-            self.doc.append(NoEscape(self.statictext['tdiscount']))
+        self.doc.append(NoEscape(self.statictext['tdiscount']))
         # self.doc.append(NoEscape(self.statictext['tvat']))  # VAT
         self.doc.append(NoEscape(self.statictext['ttotal']))  # Total = VAT + sum
         self.doc.append(Command('end', 'spreadtab'))  # End of table
-        self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(NewLine())
@@ -179,7 +177,7 @@ class Invoice:
             'Remarks: If you wish to apply for a reduction of your membership fee '
             'in the event of national severe economic downturn due to a global catastrophe '
             '(IAPS Regulations Article 3.4.4.d), this must be done within 14 days of receipt of this invoice '
-            '(IAPS EC Resolution EC/2022-23/XX). '
+            '(IAPS EC Resolution EC/2022-23/122). '
             'Failure to pay the invoice by June 1 will result in the irrevocable loss of voting rights '
             'at the Annual General Meeting for the current financial year (IAPS Charter Article 8.3) and may '
             'lead to membership termination through expulsion (IAPS Charter Article 9.1.4).')

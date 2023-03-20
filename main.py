@@ -82,7 +82,7 @@ for index, row in df.iterrows():
             np.min([400, df.at[index, 'development_factor'] * (
                     75 + 2 * (df.at[index, 'gni_atlas_method'] / 10 ** 6) ** (1 / 3))])
 
-        df.at[index, 'fee'] = df.at[index, 'fee_excl_discount']
+        df.at[index, 'fee'] = df.at[index, 'discount_total'] * df.at[index, 'fee_excl_discount']
 
     else:
         df.at[index, 'fee_excl_discount'] = 10.0
