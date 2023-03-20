@@ -294,7 +294,7 @@ def get_invoice_id(financial_year, client):
 
 def makeinvoice(client):
     financial_year = 2022
-    item = Item(financial_year, client.fee)
+    item = Item(financial_year, client.fee_excl_discount)
     this_id = get_invoice_id(financial_year, client)
     invoice = Invoice(client=client, items=[item], id=this_id,
                       financial_year=financial_year)  # Rechnungsdokument erstellen
