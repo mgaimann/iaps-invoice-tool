@@ -177,7 +177,7 @@ class Invoice:
             'Please settle the invoice within 14 days after receipt, \\textbf{using the invoice number as reference}. '
             'Please use a wire transfer to pay the invoice in a single transaction, otherwise Paypal '
             '(IAPS Regulations Article 3.4.5). VAT is not applicable (for membership fees and per Article~293 b of '
-            'the French general tax code (\\textit{TVA non applicable, art.~293 B du CGI})).'))
+            'the French general tax code \\textit{(TVA non applicable, art.~293 B du CGI)}).'))
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(
