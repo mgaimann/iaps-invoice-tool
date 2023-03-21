@@ -176,7 +176,9 @@ class Invoice:
         self.doc.append(NoEscape(
             'Please settle the invoice within 14 days after receipt, \\textbf{using the invoice number as reference}. '
             'Please use a wire transfer to pay the invoice in a single transaction, otherwise Paypal '
-            '(IAPS Regulations Article 3.4.5).\\'))
+            '(IAPS Regulations Article 3.4.5). VAT is not applicable (for membership fees and per Article~293 b of '
+            'the French general tax code (\\textit{TVA non applicable, art.~293 B du CGI})).'))
+        self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(
             'Remarks: If you wish to apply for a reduction of your membership fee '
@@ -185,7 +187,8 @@ class Invoice:
             '(IAPS EC Resolution EC/2022-23/122). '
             'Failure to pay the invoice by June 1 may result in the loss of voting rights '
             'at the Annual General Meeting for the current financial year (IAPS Charter Article 8.3) and may '
-            'lead to membership termination through expulsion (IAPS Charter Article 9.1.4).')
+            'lead to membership termination through expulsion (IAPS Charter Article 9.1.4). '
+            'This document is electronically printed and valid without stamp and signature.')
 
         self.doc.append(NewLine())
         self.doc.append(Command('end', 'small'))
@@ -234,14 +237,14 @@ class Invoice:
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(Command('end', 'footnotesize'))
-        self.doc.append("For the IAPS Executive Committee sincerely,")
-        self.doc.append(NewLine())
-        self.doc.append(NewLine())
-        self.doc.append(NewLine())
-        self.doc.append(NoEscape('\\begin{tabular}{c@{\hskip 3cm}c}'))
-        self.doc.append(NoEscape("Mario Gaimann & Max Peters \\\\"))
-        self.doc.append(NoEscape("IAPS Treasurer 2022/23 & Membership Fees Officer 2022/23 \\\\"))
-        self.doc.append(NoEscape('\\end{tabular}'))
+        # self.doc.append("For the IAPS Executive Committee sincerely,")
+        # self.doc.append(NewLine())
+        # self.doc.append(NewLine())
+        # self.doc.append(NewLine())
+        # self.doc.append(NoEscape('\\begin{tabular}{c@{\hskip 3cm}c}'))
+        # self.doc.append(NoEscape("Mario Gaimann & Max Peters \\\\"))
+        # self.doc.append(NoEscape("IAPS Treasurer 2022/23 & Membership Fees Officer 2022/23 \\\\"))
+        # self.doc.append(NoEscape('\\end{tabular}'))
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(NewLine())
