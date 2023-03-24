@@ -136,7 +136,7 @@ class Invoice:
     def generate(self):
         self.setuplatex()
         self.discount = self.client.fee_excl_discount - self.client.fee
-        self.discount = 0 if self.discount == '' else int(self.discount)
+        self.discount = 0 if self.discount == '' else self.discount
         discount_percentage = round(100 - self.client.discount_total * 100, 4)
         self.statictext['tdiscount'] = NoEscape(
             ' & & @ \\textdaggerdbl~Discount ' + f'{discount_percentage:.2f}\,\% & '
