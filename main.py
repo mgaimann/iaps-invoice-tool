@@ -71,7 +71,7 @@ for index, row in df.iterrows():
 
     # lc discount
     if df.iloc[index, 3] == 'Local Committee (LC)':
-        df.at[index, 'discount_lc'] = 0.3333
+        df.at[index, 'discount_lc'] = 1.0/3.0
 
     # compute total discount
     df.at[index, 'discount_total'] = df.at[index, 'discount_econ_downturn'] * \
