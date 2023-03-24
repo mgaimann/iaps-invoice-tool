@@ -4,10 +4,9 @@ import copy
 
 from pylatex import Document, Command, UnsafeCommand, LineBreak, NewLine, NewPage, Math  # Latex stuff
 from pylatex.utils import NoEscape  # More Latex Stuff
-import time
 import settings
 import numpy as np
-import random
+from unidecode import unidecode
 
 latex_preamble = 'preamble.tex'
 pdflatex = '/usr/bin/pdflatex'
@@ -35,12 +34,13 @@ def _(s):
 
 
 class Member:
-    def __init__(self, society=None, careof=None, street=None, postcode=None, city=None, district=None, country=None, additional=None,
+    def __init__(self, society=None, careof=None, street=None, postcode=None, city=None, district=None, country=None,
+                 additional=None,
                  phone=None, email=None, fee=None, country_code=None, membership_type=None
                  , firstname=None, lastname=None,
                  fee_excl_discount=None, discount=None, discount_total=None, discount_lc=1.0, discount_first_year=1.0,
                  discount_probationary=1.0, discount_econ_downturn=1.0, development_factor=1.0,
-                 gni_atlas_method=None):
+                 gni_atlas_method=None, lc_city=None):
         self.society = society
         self.careof = careof
         self.street = street
@@ -52,6 +52,7 @@ class Member:
         self.country_code = country_code
         self.phone = phone
         self.email = email
+        self.lc_city = lc_city
         self.fee = fee
         self.fee_excl_discount = fee_excl_discount
         self.discount = discount
@@ -140,7 +141,7 @@ class Invoice:
         discount_percentage = round(100 - self.client.discount_total * 100, 4)
         self.statictext['tdiscount'] = NoEscape(
             ' & & @ \\textdaggerdbl~Discount ' + f'{discount_percentage:.2f}\,\% & '
-                                 f' @{self.discount:.2f} EUR \\\\')
+                                                 f' @{self.discount:.2f} EUR \\\\')
         self.fill_document()
         self.doc.generate_pdf(settings.latex['output_folder'] + self.filename, compiler=pdflatex, silent=latex_silent)
         if latex_output:
@@ -256,11 +257,12 @@ class Invoice:
                         'wesp_annex': 'https://www.un.org/development/desa/dpad/wp-content/uploads/sites/45/WESP2022\\_ANNEX.pdf'}
 
         self.doc.append(
-            NoEscape('\\textsuperscript{1} Gross National Income of your country(s), Atlas Method (current USD). Source: \\href{'
-                     f'{self.sources["gni"]}'
-                     '}{The World Bank, \\\\'
-                     f'{self.sources["gni"]}'
-                     '}'))
+            NoEscape(
+                '\\textsuperscript{1} Gross National Income of your country(s), Atlas Method (current USD). Source: \\href{'
+                f'{self.sources["gni"]}'
+                '}{The World Bank, \\\\'
+                f'{self.sources["gni"]}'
+                '}'))
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(NoEscape('\\textsuperscript{2} Source: \\href{'
@@ -288,7 +290,7 @@ def get_invoice_id(financial_year, client):
         descriptor = '0000'
     elif membership_type == 'Local Committee (LC)':  # Local Committee
         short_membership_type = 'LC'
-        descriptor = ''.join(filter(str.isalpha, client.city))  # allow only letters
+        descriptor = ''.join(filter(str.isalpha, client.lc_city))  # allow only letters
         descriptor = descriptor[:4].upper()
     elif membership_type == 'Individual Member (IM)':  # Individual Member
         short_membership_type = 'IM'
@@ -298,6 +300,7 @@ def get_invoice_id(financial_year, client):
             descriptor = 'INVALID-DESCRIPTOR'
     else:
         raise ValueError('Unknown membership type')
+    descriptor = unidecode(descriptor)  # remove accents
     return f'INV-{financial_year}-{short_membership_type}-{client.country_code}-{descriptor}'
 
 

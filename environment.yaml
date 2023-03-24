@@ -8,3 +8,4 @@ dependencies:
   - snakemake
   - pandas
   - pylatex
+  - unidecode

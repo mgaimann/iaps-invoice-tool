@@ -107,6 +107,7 @@ for index, row in df.iterrows():
         phone=None,
         email=None,
         country_code=row['country_code'],
+        lc_city=row.iloc[53],
         membership_type=row.iloc[3],
         fee=row['fee'],
         fee_excl_discount=row['fee_excl_discount'],
