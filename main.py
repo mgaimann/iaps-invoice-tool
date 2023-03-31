@@ -83,12 +83,17 @@ for index, row in df.iterrows():
         df.at[index, 'fee_excl_discount'] = \
             np.min([400, df.at[index, 'development_factor'] * (
                     75 + 2 * (df.at[index, 'gni_atlas_method']) ** (1 / 3))])
+        df.at[index, 'fee_excl_discount'] = round(df.at[index, 'fee_excl_discount'], 2)  # round to full cents
 
+        # apply discount
         df.at[index, 'fee'] = df.at[index, 'discount_total'] * df.at[index, 'fee_excl_discount']
+        df.at[index, 'fee'] = round(df.at[index, 'fee'], 2)  # round to full cents
+
 
     else:
         df.at[index, 'fee_excl_discount'] = 10.0
         df.at[index, 'fee'] = 10.0
+
 
 # generate invoices
 for index, row in df.iterrows():

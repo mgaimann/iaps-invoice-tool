@@ -8,6 +8,12 @@ import settings
 import numpy as np
 from unidecode import unidecode
 
+# get version from git
+import git
+repo = git.Repo(search_parent_directories=True)
+sha = repo.head.commit.hexsha
+short_sha = repo.git.rev_parse(sha, short=7)
+
 latex_preamble = 'preamble.tex'
 pdflatex = '/usr/bin/pdflatex'
 latex_silent = True  # Set false for debugging
@@ -251,7 +257,6 @@ class Invoice:
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(NewLine())
-        self.doc.append(NewLine())
         self.doc.append(Command('scriptsize'))
         self.sources = {'gni': 'https://api.worldbank.org/v2/en/indicator/NY.GNP.ATLS.CD?downloadformat=csv',
                         'wesp_annex': 'https://www.un.org/development/desa/dpad/wp-content/uploads/sites/45/WESP2022\\_ANNEX.pdf'}
@@ -275,7 +280,10 @@ class Invoice:
         self.doc.append(NoEscape(
             'Generated with the open-source IAPS Invoice Generator based on Python and \\LaTeX, available under \\\\'
             '\\href{https://github.com/mu-gaimann/iaps-invoice-tool}{https://github.com/mu-gaimann/iaps-invoice-tool}. '
-            'Interested in contributing? Found a typo or a bug? Feedback or suggestions? Open an issue on GitHub or contact \\href{mailto:membership-fees@iaps.info}{membership-fees@iaps.info}.'))
+            'Interested in contributing? Found a typo or a bug? Feedback or suggestions? Open an issue on GitHub or contact \\href{mailto:membership-fees@iaps.info}{membership-fees@iaps.info}. '
+            f'Git Hash: {short_sha}'))
+        # self.doc.append(NewLine())
+        # self.doc.append(f'')
         self.doc.append(Command('end', 'letter'))  # End of document
 
 

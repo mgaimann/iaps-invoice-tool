@@ -9,3 +9,4 @@ dependencies:
   - pandas
   - pylatex
   - unidecode
+  - gitpython

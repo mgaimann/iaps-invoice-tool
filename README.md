@@ -22,10 +22,10 @@ The tool seeks to
 ## What does it do?
 This generator creates PDF-Documents with LaTeX.
 
-1) It reads information from the IAPS membership fee spreadsheet and enriches it with additional information (invoice number etc.)
+1) It reads information from the IAPS membership form response spreadsheet and enriches it with data to calculate the membership fees.
 2) It automatically creates a LaTeX invoice document.
 3) It processes the TeX code to PDF files using pdfTeX.
-4) It reads email information from the IAPS membership fee spreadsheet and automatically sends out the invoices.
+4) Soon: It automatically sends out the invoices.
 
 The created invoices comply in many points (but not all) with DIN 5008.
 
