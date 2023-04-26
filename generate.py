@@ -84,12 +84,14 @@ class Member:
             output += f"{self.lastname}, {self.firstname}" + '\n'
         else:
             raise ValueError("Membership type not set")
-        output += str(self.street) + '\n'
+        if self.street is not np.nan:
+            output += str(self.street) + '\n'
         if self.additional is not np.nan:
             output += str(self.additional) + '\n'
         if self.postcode is not np.nan:
             output += str(self.postcode) + '  '
-        output += str(self.city) + '\n'
+        if self.city is not np.nan:
+            output += str(self.city) + '\n'
         if self.district is not np.nan:
             output += str(self.district) + '\n'
         output += str(self.country)
@@ -99,7 +101,7 @@ class Member:
 class Item:
     def __init__(self, financial_year=None, price=None, member_name=None):
         self.qt = 1.00
-        self.desc = f'IAPS Membership Fee {financial_year}/{financial_year + 1} for the {member_name} *'
+        self.desc = f'IAPS Membership Fee {financial_year}/{financial_year + 1} for (the) {member_name} *'
         self.price = price
 
 
