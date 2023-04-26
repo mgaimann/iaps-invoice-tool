@@ -13,6 +13,7 @@ df.iloc[:, 3].replace(['National Commitee (NC)'],  ['National Committee (NC)'], 
 
 # collect gni data
 df['country'] = None
+df['gni_country'] = None
 df['country_code'] = None
 df['gni_atlas_method'] = 0.0
 df['development_factor'] = 1.0
@@ -26,7 +27,11 @@ df['fee_excl_discount'] = 9999.99
 
 # compute quantities for each association
 for index, row in df.iterrows():
-    df.at[index, 'country'] = row.iloc[7].strip()
+    df.at[index, 'country'] = row.iloc[7].strip()  # from address
+    try:
+        df.at[index, 'gni_country'] = row.iloc[52].strip()  # from country (only relevant for mixed NCs, e.g. UK and Ireland)
+    except AttributeError:
+        df.at[index, 'gni_country'] = df.at[index, 'country']  # from address
 
     # country code
     country_code = gni_df[gni_df['Country Name'] == df.at[index, 'country']]['Country Code']
@@ -36,7 +41,7 @@ for index, row in df.iterrows():
         df.at[index, 'country_code'] = 'XXX'
 
     # gni atlas method
-    gni = gni_df[gni_df['Country Name'] == df.at[index, 'country']]['LATEST DATA']
+    gni = gni_df[gni_df['Country Name'] == df.at[index, 'gni_country']]['LATEST DATA']
     try:
         df.at[index, 'gni_atlas_method'] = gni.values[0] / 10 ** 6
     except IndexError:
