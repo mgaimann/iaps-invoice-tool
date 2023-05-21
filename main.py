@@ -79,9 +79,9 @@ for index, row in df.iterrows():
         df.at[index, 'discount_lc'] = 1.0/3.0
 
     # compute total discount
-    df.at[index, 'discount_total'] = df.at[index, 'discount_econ_downturn'] * \
-                                     df.at[index, 'discount_first_year'] * df.at[index, 'discount_probationary'] * \
-                                     df.at[index, 'discount_lc']
+    df.at[index, 'discount_total'] = (df.at[index, 'discount_econ_downturn'] *
+                                      df.at[index, 'discount_first_year'] * df.at[index, 'discount_probationary'] *
+                                      df.at[index, 'discount_lc'])
 
     # membership fees
     if df.iloc[index, 3] != 'Individual Member (IM)':
@@ -91,7 +91,7 @@ for index, row in df.iterrows():
         df.at[index, 'fee_excl_discount'] = round(df.at[index, 'fee_excl_discount'], 2)  # round to full cents
 
         # apply discount
-        discount = round(df.at[index, 'discount_total'] * df.at[index, 'fee_excl_discount'], 2)
+        discount = round((1.0 - df.at[index, 'discount_total']) * df.at[index, 'fee_excl_discount'], 2)
         df.at[index, 'fee'] = df.at[index, 'fee_excl_discount'] - discount  # round to full cents
 
 

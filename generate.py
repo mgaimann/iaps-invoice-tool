@@ -44,7 +44,7 @@ class Member:
                  additional=None,
                  phone=None, email=None, fee=None, country_code=None, membership_type=None
                  , firstname=None, lastname=None,
-                 fee_excl_discount=None, discount=None, discount_total=None, discount_lc=1.0, discount_first_year=1.0,
+                 fee_excl_discount=None, discount_total=None, discount_lc=1.0, discount_first_year=1.0,
                  discount_probationary=1.0, discount_econ_downturn=1.0, development_factor=1.0,
                  gni_atlas_method=None, lc_city=None):
         self.society = society
@@ -61,7 +61,6 @@ class Member:
         self.lc_city = lc_city
         self.fee = fee
         self.fee_excl_discount = fee_excl_discount
-        self.discount = discount
         self.membership_type = membership_type
         self.firstname = firstname
         self.lastname = lastname
@@ -111,7 +110,7 @@ class Invoice:
         self.subject = f"Your IAPS Membership Fee {financial_year}/{str(int(financial_year) + 1)} --- Invoice"
         self.client = client
         self.me = seller
-        self.discount = client.discount
+        self.discount_absolute = ''
         self.items = items if items is not None else []
         self.filename = self.id
         self.documentclass = None
@@ -144,12 +143,12 @@ class Invoice:
 
     def generate(self):
         self.setuplatex()
-        self.discount = self.client.fee_excl_discount - self.client.fee
-        self.discount = 0 if self.discount == '' else self.discount
+        self.discount_absolute = self.client.fee_excl_discount - self.client.fee
+        self.discount_absolute = 0 if self.discount_absolute == '' else self.discount_absolute
         discount_percentage = round(100 - self.client.discount_total * 100, 4)
         self.statictext['tdiscount'] = NoEscape(
             ' & & @ \\textdaggerdbl~Discount ' + f'{discount_percentage:.2f}\,\% & '
-                                                 f' @{self.discount:.2f} EUR \\\\')
+                                                 f' @{self.discount_absolute:.2f} EUR \\\\')
         self.fill_document()
         self.doc.generate_pdf(settings.latex['output_folder'] + self.filename, compiler=pdflatex, silent=latex_silent)
         if latex_output:
