@@ -259,8 +259,8 @@ class Invoice:
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(Command('scriptsize'))
-        self.sources = {'gni': 'https://api.worldbank.org/v2/en/indicator/NY.GNP.ATLS.CD?downloadformat=csv',
-                        'wesp_annex': 'https://www.un.org/development/desa/dpad/wp-content/uploads/sites/45/WESP2022\\_ANNEX.pdf'}
+        self.sources = {'gni': 'https://data.worldbank.org/indicator/NY.GNP.ATLS.CD',
+                        'wesp_annex': 'https://desapublications.un.org/publications/world-economic-situation-and-prospects-2023'}
 
         self.doc.append(
             NoEscape(
@@ -273,15 +273,14 @@ class Invoice:
         self.doc.append(NewLine())
         self.doc.append(NoEscape('\\textsuperscript{2} Source: \\href{'
                                  f'{self.sources["wesp_annex"]}'
-                                 '}{United Nations,  Dept.~of Economic and Social Affairs, World Economic Situation and Prospects 2022,\\\\'
+                                 '}{United Nations,  Dept.~of Economic and Social Affairs, World Economic Situation and Prospects,\\\\'
                                  f'{self.sources["wesp_annex"]}'
                                  '}'))
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(NoEscape(
-            'Generated with the open-source IAPS Invoice Generator based on Python and \\LaTeX, available under \\\\'
-            '\\href{https://github.com/mu-gaimann/iaps-invoice-tool}{https://github.com/mu-gaimann/iaps-invoice-tool}. '
-            'Interested in contributing? Found a typo or a bug? Feedback or suggestions? Open an issue on GitHub or contact \\href{mailto:membership-fees@iaps.info}{membership-fees@iaps.info}. '
+            'Generated with the IAPS Invoice Generator based on Python and \\LaTeX. \\\\'
+            'Interested in contributing? Found a typo or a bug? Feedback or suggestions? Contact \\href{mailto:membership-fees@iaps.info}{membership-fees@iaps.info}. '
             f'Git Hash: {short_sha}'))
         # self.doc.append(NewLine())
         # self.doc.append(f'')
@@ -314,7 +313,7 @@ def get_invoice_id(financial_year, client):
 
 
 def makeinvoice(client):
-    financial_year = 2022
+    financial_year = 2023
     if client.membership_type != 'Individual Member (IM)':
         member_name = client.society
     else:

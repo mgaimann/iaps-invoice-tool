@@ -58,11 +58,14 @@ for index, row in df.iterrows():
     df.at[index, 'discount_econ_downturn'] = 1.0
 
     # financial year of joining
+    # TODO: THIS NEEDS TO BE ADJUSTED EVERY YEAR
     financial_year_of_joining_answer = df.iloc[index, 54]
-    if financial_year_of_joining_answer == 'did not join as full member so far, my LC/NC joined or applies to join as provisional member in the financial year 2022 (i.e. between September 1, 2022 and August 31, 2023)':
+    if financial_year_of_joining_answer == 'did not join as full member so far, my LC/NC joined or applies to join as provisional member in the financial year 2023 (i.e. between September 1, 2023 and August 31, 2024)':
         financial_year_of_joining = 'this_year'
-    elif financial_year_of_joining_answer == 'in the last financial year, 2021 (i.e. between September 1, 2021 and August 31, 2022)':
+    elif financial_year_of_joining_answer == 'did not join as full member so far, my LC/NC joined or applies to join as provisional member in the financial year 2022 (i.e. between September 1, 2022 and August 31, 2023)':
         financial_year_of_joining = 'last_year'
+    elif financial_year_of_joining_answer == 'in the last financial year, 2021 (i.e. between September 1, 2021 and August 31, 2022)':
+        financial_year_of_joining = 'before_last_year'
     elif financial_year_of_joining_answer == 'before the financial year of 2021 (i.e. before September 1, 2021)':
         financial_year_of_joining = 'before_last_year'
     else:
