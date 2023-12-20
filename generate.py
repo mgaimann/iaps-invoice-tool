@@ -184,8 +184,7 @@ class Invoice:
         self.doc.append(NoEscape(
             'Please settle the invoice within 14 days after receipt, \\textbf{using the invoice number as reference}. '
             'Please use a wire transfer to pay the invoice in a single transaction, otherwise Paypal '
-            '(IAPS Regulations Article 3.4.5). VAT is not applicable (for membership fees and per Art.~293 b of '
-            'the French general tax code \\textit{(TVA non applicable, art.~293 B du CGI)}).'))
+            '(IAPS Regulations Article 3.4.5).'))
         self.doc.append(NewLine())
         self.doc.append(NewLine())
         self.doc.append(
@@ -195,8 +194,7 @@ class Invoice:
             '(IAPS EC Resolution EC/2022-23/122). '
             'Failure to pay the invoice by June 1 may result in the loss of voting rights '
             'at the Annual General Meeting for the current financial year (IAPS Charter Article 8.3) and may '
-            'lead to membership termination through expulsion (IAPS Charter Article 9.1.4). '
-            'This document is electronically printed and valid without stamp and signature.')
+            'lead to membership termination through expulsion (IAPS Charter Article 9.1.4).')
 
         self.doc.append(NewLine())
         self.doc.append(Command('end', 'small'))
@@ -280,7 +278,8 @@ class Invoice:
         self.doc.append(NewLine())
         self.doc.append(NoEscape(
             'Generated with the IAPS Invoice Generator based on Python and \\LaTeX. \\\\'
-            'Interested in contributing? Found a typo or a bug? Feedback or suggestions? Contact \\href{mailto:membership-fees@iaps.info}{membership-fees@iaps.info}. '
+            'Interested in contributing? Found a typo or a bug? Feedback or suggestions? \\\\'
+            'Contact \\href{mailto:membership-fees@iaps.info}{membership-fees@iaps.info}. '
             f'Git Hash: {short_sha}'))
         # self.doc.append(NewLine())
         # self.doc.append(f'')

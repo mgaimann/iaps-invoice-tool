@@ -103,6 +103,9 @@ for index, row in df.iterrows():
         df.at[index, 'fee'] = 10.0
 
 
+# individual membership is tied to the financial year, if joined in a past year then these entries must be removed
+df.drop(df[(df.iloc[:, 54] != 'this_year') & (df.iloc[:, 3] == 'Individual Member (IM)')].index, inplace=True)
+
 # generate invoices
 for index, row in df.iterrows():
     print(f"Creating invoice number {index}...")
